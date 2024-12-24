@@ -1,23 +1,52 @@
+'use client'
 import Image from "next/image";
 
+import { useEffect, useRef } from "react";
+import Sidebar from "./components/sidebar";
+import { sidebarItems } from "./data/sidebarItems";
+import Header from "./components/header";
+import Footer from "./components/footer";
+
 export default function Home() {
+  const sectionsRef = useRef<HTMLElement[]>([]); // Array of section references
+  const currentSection = useRef<number>(0); // Current section index
+
+  const scrollToSection = (index: number) => {
+    if (sectionsRef.current[index]) {
+      sectionsRef.current[index].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const handleWheel = (event: WheelEvent) => {
+      if (event.deltaY > 0 && currentSection.current < sectionsRef.current.length - 1) {
+        currentSection.current++;
+      } else if (event.deltaY < 0 && currentSection.current > 0) {
+        currentSection.current--;
+      }
+      scrollToSection(currentSection.current);
+    };
+
+    window.addEventListener("wheel", handleWheel);
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
   return (
-    <div className="">
-      
-      <main className="flex items-center justify-center min-h-screen">
-        <div className="relative w-40 h-40">
-          <Image src="/profile.JPG"
-            alt="Profile" 
-            layout="fill"
-            objectFit="cover"
-            className="rounded-full border-4 border-blue-500"
-          />
-        </div>
-        <div className="bg-blue-600 text-white py-4 shadow-md">
-          <h1 className="text-center text-2xl font-bold">Mukesh Mahara</h1>
-          <p className="text-center text-sm">Ruby on Rails Developer | Software Engineer</p>
-        </div>
+    <div>
+
+      <main className="flex items-start min-h-screen">
+        <Header />
+
+        <Sidebar items={sidebarItems} />
+
       </main>
+        <Footer />
+
     </div>
   );
 }

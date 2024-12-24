@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Sidebar from "./components/sidebar";
+import { sidebarItems } from "./data/sidebarItems";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,12 +29,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        
+        <div className="snowflakes" aria-hidden="true">
+          <div className="snowflake">❄</div>
+          <div className="snowflake">❄</div>
+          <div className="snowflake">❄</div>
+          <div className="snowflake">❄</div>
+          <div className="snowflake">❄</div>
+          <div className="snowflake">❄</div>
+        </div>
+
         {children}
+        
       </body>
-      <footer className="bg-blue-600 text-white py-4 text-center">
-        <p>&copy; 2024 Mukesh Mahara. All Rights Reserved.</p>
-      </footer>
     </html>
   );
 }
