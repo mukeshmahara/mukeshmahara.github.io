@@ -16,9 +16,9 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = () => {
     return (
-        <aside className="sidebar">
+        <aside className="shrink-0 bg-gray-800 text-white p-2">
             <ul>
-                <div className="grid grid-cols-1 ">
+                <div className="border-1 w-16 ">
                     <div className="relative w-40 h-40">
                         <Image src="/profile.JPG"
                             alt="Profile"
@@ -30,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
                 </div>
                 {sidebarItems.map((item) => (
                     <li key={item.id}>
-                        <Link href={item.route} className="sidebar-link border p-2 text-center">
+                        <Link href={item.route} className="sidebar-link p-2 text-center">
                             {item.icon && <i className={`fa ${item.icon}`} aria-hidden="true"></i>}
                             <span>{item.label}</span>
                         </Link>

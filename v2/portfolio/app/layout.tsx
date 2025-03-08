@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Sidebar from "./components/sidebar";
 import { sidebarItems } from "./data/sidebarItems";
+import Header from "./components/header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,20 +27,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <div className="snowflakes" aria-hidden="true">
-          <div className="snowflake">❄</div>
-          <div className="snowflake">❄</div>
-          <div className="snowflake">❄</div>
-          <div className="snowflake">❄</div>
-          <div className="snowflake">❄</div>
-          <div className="snowflake">❄</div>
-        </div>
+      <body>
+        <div className="flex flex-col">
+          <div className="snowflakes" aria-hidden="true">
+            <div className="snowflake">❄</div>
+            <div className="snowflake">❄</div>
+            <div className="snowflake">❄</div>
+            <div className="snowflake">❄</div>
+            <div className="snowflake">❄</div>
+            <div className="snowflake">❄</div>
+          </div>
+          <Header />
 
-        {children}
-        
+          {/* Main content here */}
+          <main className="">
+            <Sidebar items={sidebarItems} />
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );

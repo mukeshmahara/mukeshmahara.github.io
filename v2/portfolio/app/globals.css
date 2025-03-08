@@ -23,7 +23,6 @@ body {
   background-color: #282c34;
   overflow: hidden;
   height: 100vh;
-  display: flex;
   
 }
 
@@ -96,50 +95,6 @@ body {
   animation-delay: -10s;
 }
 
-
-body, html {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden; /* Optional: Prevent scrollbars */
-}
-
-.container {
-  height: 100vh;
-  scroll-snap-type: y mandatory; /* Enable vertical scroll snap */
-  overflow-y: scroll; /* Allow vertical scrolling */
-}
-
-.section {
-  height: 100vh; /* Each section takes the full viewport height */
-  scroll-snap-align: start; /* Align sections to start on scroll */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2rem;
-}
-
-.sidebar {
-  width: 200px;
-  height: 100vh;
-  background-color: #282c34;
-  color: white;
-  padding: 20px 10px;
-  position: fixed;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar li {
-  margin: 10px 0;
-}
-
 .sidebar-link {
   text-decoration: none;
   color: white;
@@ -148,10 +103,9 @@ body, html {
 }
 
 .sidebar-link i {
-  margin-right: 10px;
+  align-items: center;
+  margin-right: 0px;
 }
-
-
 
 @media (max-width: 768px) {
   .nav ul {

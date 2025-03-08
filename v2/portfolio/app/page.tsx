@@ -2,8 +2,6 @@
 import Image from "next/image";
 
 import { useEffect, useRef } from "react";
-import Sidebar from "./components/sidebar";
-import { sidebarItems } from "./data/sidebarItems";
 import Header from "./components/header";
 import Footer from "./components/footer";
 
@@ -38,15 +36,20 @@ export default function Home() {
   }, []);
   return (
     <div>
+      <div className="card border-left-1">
 
-      <main className="flex items-start min-h-screen">
-        <Header />
 
-        <Sidebar items={sidebarItems} />
+        <section className=" bg-gray-800 h-screen">
+          <div className="flex max-w-fit max-w-max ">
 
-      </main>
-        <Footer />
+            <p className="text-lg relative top-3 left-4">Mukesh </p>
+          </div>
+          <div className="h-screen flex">world</div>
+          <Footer />
+        </section>
 
-    </div>
+
+      </div >
+    </div >
   );
 }
