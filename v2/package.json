@@ -2,7 +2,7 @@
   "name": "demo",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://mukeshmahara.github.io/https://github.com/mukeshmahara/mukeshmahara.github.io",
+  "homepage": "https://mukeshmahara.github.io/",
 
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
