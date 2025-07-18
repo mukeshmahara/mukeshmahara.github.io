@@ -1,41 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
 
-    <link rel="icon" href="%PUBLIC_URL%/mukesh_profile.jpg" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/mukesh_profile.jpg" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+<head>
+  <meta charset="utf-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="%PUBLIC_URL%/mukesh_profile.jpg" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/mukesh_profile.jpg" />
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-    <!-- Primary Meta Tags -->
-    <title>Mukesh Mahara – Full Stack Software Engineer</title>
-    <meta name="title" content="Mukesh Mahara – Full Stack Software Engineer" />
-    <meta name="description" content="Experienced full stack software engineer skilled in React, Node.js, and cloud technologies. Passionate about building scalable, high-performance web applications." />
-    <meta name="keywords" content="Mukesh Mahara, Software Engineer, Full Stack Developer, React, Node.js, Web Developer, Portfolio" />
-    <meta name="author" content="Mukesh Mahara" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mukeshmahara.com.np/" />
-    <meta property="og:title" content="Mukesh Mahara – Full Stack Software Engineer" />
-    <meta property="og:description" content="Experienced in React, Node.js, and cloud technologies. Explore my portfolio and projects." />
-    <meta property="og:image" content="%PUBLIC_URL%/mukesh_profile.jpg" />
+  <!-- Primary Meta Tags -->
+  <title>Mukesh Mahara – Full Stack Software Engineer</title>
+  <meta name="title" content="Mukesh Mahara – Full Stack Software Engineer" />
+  <meta name="description"
+    content="Experienced full stack software engineer skilled in React, Node.js, and cloud technologies. Passionate about building scalable, high-performance web applications." />
+  <meta name="keywords"
+    content="Mukesh Mahara, Software Engineer, Full Stack Developer, React, Node.js, Web Developer, Portfolio" />
+  <meta name="author" content="Mukesh Mahara" />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://mukeshmahara.com.np/" />
-    <meta property="twitter:title" content="Mukesh Mahara – Full Stack Software Engineer" />
-    <meta property="twitter:description" content="Experienced in React, Node.js, and cloud technologies. Explore my portfolio and projects." />
-    <meta property="twitter:image" content="%PUBLIC_URL%/mukesh_profile.jpg" />
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mukeshmahara.com.np/" />
+  <meta property="og:title" content="Mukesh Mahara – Full Stack Software Engineer" />
+  <meta property="og:description"
+    content="Experienced in React, Node.js, and cloud technologies. Explore my portfolio and projects." />
+  <meta property="og:image" content="%PUBLIC_URL%/mukesh_profile.jpg" />
 
-    <!-- Canonical Link (Optional but Recommended) -->
-    <link rel="canonical" href="https://mukeshmahara.com.np/" />
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-  </body>
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://mukeshmahara.com.np/" />
+  <meta property="twitter:title" content="Mukesh Mahara – Full Stack Software Engineer" />
+  <meta property="twitter:description"
+    content="Experienced in React, Node.js, and cloud technologies. Explore my portfolio and projects." />
+  <meta property="twitter:image" content="%PUBLIC_URL%/mukesh_profile.jpg" />
+
+  <!-- Canonical Link (Optional but Recommended) -->
+  <link rel="canonical" href="https://mukeshmahara.com.np/" />
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+
+  <!-- Messenger Chat Plugin Code -->
+  <div id="fb-root"></div>
+
+  <!-- Your Chat Plugin code -->
+  <div id="fb-customer-chat" className="fb-customerchat"></div>
+
+  <script>
+    var chatbox = document.getElementById('fb-customer-chat');
+    chatbox.setAttribute("page_id", "1762526510452000");
+    chatbox.setAttribute("attribution", "biz_inbox");
+  </script>
+
+  <!-- Load Facebook SDK -->
+  <script>
+    window.fbAsyncInit = function () {
+      FB.init({
+        xfbml: true,
+        version: 'v19.0'
+      });
+    };
+
+    (function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = 'https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js';
+      fjs.parentNode.insertBefore(js, fjs);
+    })(document, 'script', 'facebook-jssdk');
+  </script>
+
+</body>
+
 </html>

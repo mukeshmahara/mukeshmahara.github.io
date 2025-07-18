@@ -1,6 +1,7 @@
 import React from 'react';
 import ProjectCard from './ProjectCard';
 import listengine from '../assets/listengine.png'; // Adjust the import path as necessary
+import physio from '../assets/physio.jpg'; // Adjust the import path as necessary
 // Sample project data - replace with your actual projects
 const projectsData = [
   {
@@ -10,7 +11,7 @@ const projectsData = [
     image: listengine,
     technologies: ["Ruby on Rails", "PostgreSQL", "Redis", "React", "Hotwire"],
     githubLink: "https://github.com/mukeshmahara/auction-platform",
-    liveLink: "https://dev.alistengine.com"
+    liveLink: "https://app-react.alistengine.com"
   },
   {
     id: 2,
@@ -19,7 +20,7 @@ const projectsData = [
     image: "https://via.placeholder.com/640x360?text=Healthcare+System",
     technologies: ["Ruby on Rails", "MySQL", "SASS", "Stimulus.js"],
     githubLink: "https://github.com/mukeshmahara/healthcare-system",
-    liveLink: "https://healthcare-system.example.com"
+    liveLink: "https://healthcare-system.mukeshmahara.com.np"
   },
   {
     id: 3,
@@ -28,7 +29,7 @@ const projectsData = [
     image: "https://via.placeholder.com/640x360?text=Logistics+Dashboard",
     technologies: ["Next.js", "Chart.js", "Material UI", "Node.js"],
     githubLink: "https://github.com/mukeshmahara/shipping-logistics",
-    liveLink: "https://logistics.example.com"
+    liveLink: "https://logistics.mukeshmahara.com.np"
   },
   {
     id: 4,
@@ -37,7 +38,7 @@ const projectsData = [
     image: "https://via.placeholder.com/640x360?text=E-commerce+Platform",
     technologies: ["Ruby on Rails", "PostgreSQL", "Bootstrap", "jQuery"],
     githubLink: "https://github.com/mukeshmahara/ecommerce",
-    liveLink: "https://ecommerce.example.com"
+    liveLink: "https://ecommerce.mukeshmahara.com.np"
   },
   {
     id: 5,
@@ -46,7 +47,7 @@ const projectsData = [
     image: "https://via.placeholder.com/640x360?text=E-commerce+Platform",
     technologies: ["Ruby on Rails", "PostgreSQL", "Bootstrap", "jQuery"],
     githubLink: "https://github.com/mukeshmahara/ecommerce",
-    liveLink: "https://ecommerce.example.com"
+    liveLink: "https://ecommerce.mukeshmahara.com.np"
   },
   {
     id: 6,
@@ -55,7 +56,7 @@ const projectsData = [
     image: "https://via.placeholder.com/640x360?text=E-commerce+Platform",
     technologies: ["Ruby on Rails", "PostgreSQL", "Bootstrap", "jQuery"],
     githubLink: "https://github.com/mukeshmahara/ecommerce",
-    liveLink: "https://ecommerce.example.com"
+    liveLink: "https://weather.mukeshmahara.com.np"
   },
   {
     id: 7,
@@ -64,7 +65,7 @@ const projectsData = [
     image: "https://via.placeholder.com/640x360?text=E-commerce+Platform",
     technologies: ["Ruby on Rails", "PostgreSQL", "Bootstrap", "jQuery"],
     githubLink: "https://github.com/mukeshmahara/ecommerce",
-    liveLink: "https://ecommerce.example.com"
+    liveLink: "https://tictactoe.mukeshmahara.com.np"
   },
   {
     id: 8,
@@ -73,7 +74,16 @@ const projectsData = [
     image: "https://via.placeholder.com/640x360?text=E-commerce+Platform",
     technologies: ["Ruby on Rails", "PostgreSQL", "Bootstrap", "jQuery"],
     githubLink: "https://github.com/mukeshmahara/ecommerce",
-    liveLink: "https://ecommerce.example.com"
+    liveLink: "https://dmv.mukeshmahara.com.np"
+  },
+  {
+    id: 9,
+    title: "PhysioHub Nepal",
+    description: "Developed a scalable healthcare platform for physiotherapy services, including appointment scheduling, patient management, and telehealth features.",
+    image: physio,
+    technologies: ["Ruby on Rails", "PostgreSQL", "Bootstrap", "jQuery"],
+    githubLink: "https://github.com/mukeshmahara/ecommerce",
+    liveLink: "https://dev-physio.mukeshmahara.com.np"
   }
 ];
 
