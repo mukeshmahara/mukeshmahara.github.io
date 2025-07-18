@@ -2,6 +2,7 @@ import React from 'react';
 import ProjectCard from './ProjectCard';
 import listengine from '../assets/listengine.png'; // Adjust the import path as necessary
 import physio from '../assets/physio.jpg'; // Adjust the import path as necessary
+import tictactoe from '../assets/tiktactoe.png'; // Adjust the import path as necessary
 // Sample project data - replace with your actual projects
 const projectsData = [
   {
@@ -62,7 +63,7 @@ const projectsData = [
     id: 7,
     title: "TIC TAC TOE Game",
     description: "Developed a scalable e-commerce solution with features including product catalog management, user authentication, shopping cart functionality, payment processing, and order management. Implemented responsive design for optimal mobile experience.",
-    image: "https://via.placeholder.com/640x360?text=E-commerce+Platform",
+    image: tictactoe,
     technologies: ["Ruby on Rails", "PostgreSQL", "Bootstrap", "jQuery"],
     githubLink: "https://github.com/mukeshmahara/ecommerce",
     liveLink: "https://tictactoe.mukeshmahara.com.np"
