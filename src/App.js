@@ -47,10 +47,9 @@ function App() {
         return <Intro />;
       case 'projects':
         return (
-          <div className="content-section">
-            <h2>My Projects</h2>
+          
             <Projects />
-          </div>
+          
         );
       case 'experience':
         return <Experience />;
