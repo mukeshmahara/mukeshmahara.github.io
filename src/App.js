@@ -81,7 +81,11 @@ function App() {
 
       <div className="layout">
         {/* Sidebar */}
-        <Sidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+        <Sidebar 
+          activeSection={activeSection} 
+          setActiveSection={setActiveSection} 
+          closeMenu={closeMenu}
+        />
 
         {/* Main Content */}
         <main className="content">

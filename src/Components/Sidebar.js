@@ -1,7 +1,14 @@
 import React from 'react';
 import ParticleBackground from './ParticleBackground';
 
-const Sidebar = ({ activeSection, setActiveSection }) => {
+const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
+  const handleNavClick = (section) => {
+    setActiveSection(section);
+    if (closeMenu) {
+      closeMenu(); // Close mobile menu after navigation
+    }
+  };
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -17,37 +24,37 @@ const Sidebar = ({ activeSection, setActiveSection }) => {
         <ul>
           <li 
             className={activeSection === "intro" ? "active" : ""} 
-            onClick={() => setActiveSection('intro')}
+            onClick={() => handleNavClick('intro')}
           >
             Intro
           </li>
           <li
             className={activeSection === 'projects' ? 'active' : ''}
-            onClick={() => setActiveSection('projects')}
+            onClick={() => handleNavClick('projects')}
           >
             Projects
           </li>
           <li
             className={activeSection === 'experience' ? 'active' : ''}
-            onClick={() => setActiveSection('experience')}
+            onClick={() => handleNavClick('experience')}
           >
             Work Experience
           </li>
           <li
             className={activeSection === 'education' ? 'active' : ''}
-            onClick={() => setActiveSection('education')}
+            onClick={() => handleNavClick('education')}
           >
             Education
           </li>
           <li
             className={activeSection === 'skills' ? 'active' : ''}
-            onClick={() => setActiveSection('skills')}
+            onClick={() => handleNavClick('skills')}
           >
             Skills
           </li>
           <li
             className={activeSection === 'achievements' ? 'active' : ''}
-            onClick={() => setActiveSection('achievements')}
+            onClick={() => handleNavClick('achievements')}
           >
             Achievements
           </li>
