@@ -1,10 +1,13 @@
 import React from 'react';
-import ParticleBackground from './ParticleBackground';
 
 const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
-  const handleNavClick = (section) => {
+  const handleNavClick = (section, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Navigation clicked:', section); // Debug log
     setActiveSection(section);
     if (closeMenu) {
+      console.log('Closing mobile menu'); // Debug log
       closeMenu(); // Close mobile menu after navigation
     }
   };
@@ -20,41 +23,40 @@ const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
       </div>
 
       <nav className="sidebar-nav">
-        <ParticleBackground />
         <ul>
           <li 
             className={activeSection === "intro" ? "active" : ""} 
-            onClick={() => handleNavClick('intro')}
+            onClick={(e) => handleNavClick('intro', e)}
           >
             Intro
           </li>
           <li
             className={activeSection === 'projects' ? 'active' : ''}
-            onClick={() => handleNavClick('projects')}
+            onClick={(e) => handleNavClick('projects', e)}
           >
             Projects
           </li>
           <li
             className={activeSection === 'experience' ? 'active' : ''}
-            onClick={() => handleNavClick('experience')}
+            onClick={(e) => handleNavClick('experience', e)}
           >
             Work Experience
           </li>
           <li
             className={activeSection === 'education' ? 'active' : ''}
-            onClick={() => handleNavClick('education')}
+            onClick={(e) => handleNavClick('education', e)}
           >
             Education
           </li>
           <li
             className={activeSection === 'skills' ? 'active' : ''}
-            onClick={() => handleNavClick('skills')}
+            onClick={(e) => handleNavClick('skills', e)}
           >
             Skills
           </li>
           <li
             className={activeSection === 'achievements' ? 'active' : ''}
-            onClick={() => handleNavClick('achievements')}
+            onClick={(e) => handleNavClick('achievements', e)}
           >
             Achievements
           </li>

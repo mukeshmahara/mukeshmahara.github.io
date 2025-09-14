@@ -23,6 +23,7 @@ function App() {
   };
 
   const closeMenu = () => {
+    console.log('closeMenu called, menuOpen:', menuOpen); // Debug log
     setMenuOpen(false);
     document.body.classList.remove('mobile-menu-open');
   };
