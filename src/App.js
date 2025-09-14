@@ -13,6 +13,8 @@ function App() {
   const [activeSection, setActiveSection] = useState('intro');
   const [menuOpen, setMenuOpen] = useState(false);
 
+  console.log('App render - activeSection:', activeSection, 'menuOpen:', menuOpen); // Debug log
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
     if (!menuOpen) {
@@ -26,6 +28,11 @@ function App() {
     console.log('closeMenu called, menuOpen:', menuOpen); // Debug log
     setMenuOpen(false);
     document.body.classList.remove('mobile-menu-open');
+  };
+
+  const handleSetActiveSection = (section) => {
+    console.log('setActiveSection called with:', section); // Debug log
+    setActiveSection(section);
   };
 
   useEffect(() => {
@@ -84,7 +91,7 @@ function App() {
         {/* Sidebar */}
         <Sidebar 
           activeSection={activeSection} 
-          setActiveSection={setActiveSection} 
+          setActiveSection={handleSetActiveSection} 
           closeMenu={closeMenu}
         />
 

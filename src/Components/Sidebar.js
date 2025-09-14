@@ -2,14 +2,18 @@ import React from 'react';
 
 const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
   const handleNavClick = (section, e) => {
-    e.preventDefault();
-    e.stopPropagation();
     console.log('Navigation clicked:', section); // Debug log
     setActiveSection(section);
     if (closeMenu) {
       console.log('Closing mobile menu'); // Debug log
       closeMenu(); // Close mobile menu after navigation
     }
+  };
+
+  const handleTouchEnd = (section, e) => {
+    e.preventDefault();
+    console.log('Navigation touched:', section); // Debug log
+    handleNavClick(section, e);
   };
 
   return (
@@ -23,44 +27,56 @@ const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
       </div>
 
       <nav className="sidebar-nav">
-        <ul>
-          <li 
-            className={activeSection === "intro" ? "active" : ""} 
+        <div role="menu">
+          <button 
+            type="button"
+            className={`nav-button ${activeSection === "intro" ? "active" : ""}`}
             onClick={(e) => handleNavClick('intro', e)}
+            onTouchEnd={(e) => handleTouchEnd('intro', e)}
           >
             Intro
-          </li>
-          <li
-            className={activeSection === 'projects' ? 'active' : ''}
+          </button>
+          <button
+            type="button"
+            className={`nav-button ${activeSection === 'projects' ? 'active' : ''}`}
             onClick={(e) => handleNavClick('projects', e)}
+            onTouchEnd={(e) => handleTouchEnd('projects', e)}
           >
             Projects
-          </li>
-          <li
-            className={activeSection === 'experience' ? 'active' : ''}
+          </button>
+          <button
+            type="button"
+            className={`nav-button ${activeSection === 'experience' ? 'active' : ''}`}
             onClick={(e) => handleNavClick('experience', e)}
+            onTouchEnd={(e) => handleTouchEnd('experience', e)}
           >
             Work Experience
-          </li>
-          <li
-            className={activeSection === 'education' ? 'active' : ''}
+          </button>
+          <button
+            type="button"
+            className={`nav-button ${activeSection === 'education' ? 'active' : ''}`}
             onClick={(e) => handleNavClick('education', e)}
+            onTouchEnd={(e) => handleTouchEnd('education', e)}
           >
             Education
-          </li>
-          <li
-            className={activeSection === 'skills' ? 'active' : ''}
+          </button>
+          <button
+            type="button"
+            className={`nav-button ${activeSection === 'skills' ? 'active' : ''}`}
             onClick={(e) => handleNavClick('skills', e)}
+            onTouchEnd={(e) => handleTouchEnd('skills', e)}
           >
             Skills
-          </li>
-          <li
-            className={activeSection === 'achievements' ? 'active' : ''}
+          </button>
+          <button
+            type="button"
+            className={`nav-button ${activeSection === 'achievements' ? 'active' : ''}`}
             onClick={(e) => handleNavClick('achievements', e)}
+            onTouchEnd={(e) => handleTouchEnd('achievements', e)}
           >
             Achievements
-          </li>
-        </ul>
+          </button>
+        </div>
       </nav>
 
       <div className="sidebar-footer">

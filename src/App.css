@@ -871,6 +871,59 @@ h3 {
     z-index: 50;
   }
 
+  /* Ensure mobile sidebar navigation is interactive */
+  .sidebar .sidebar-nav {
+    position: relative;
+    z-index: 101;
+    touch-action: manipulation;
+  }
+
+  .sidebar .sidebar-nav li {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(52, 152, 219, 0.2);
+    tap-highlight-color: rgba(52, 152, 219, 0.2);
+  }
+
+  /* Navigation button styles for mobile */
+  .nav-button {
+    display: block;
+    width: 100%;
+    padding: 15px 20px;
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .nav-button::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 0;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+  }
+
+  .nav-button:hover::before {
+    width: 100%;
+  }
+
+  .nav-button.active {
+    background-color: rgba(52, 152, 219, 0.2);
+  }
+
+  .nav-button.active::before {
+    width: 100%;
+  }
+
   /* Adjust layout */
   .layout {
     flex-direction: column;
