@@ -1,53 +1,131 @@
-# Getting Started with Create React App
+# Mukesh Mahara - Full Stack Software Engineer Portfolio
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to my professional portfolio! This is a modern, interactive web application built with React that showcases my skills, experience, and projects as a full-stack software engineer.
 
-## Available Scripts
+**Live Site:** [https://mukeshmahara.com.np](https://mukeshmahara.com.np)
 
-In the project directory, you can run:
+## 📋 About
+
+I'm a creative and results-driven full-stack software engineer specializing in:
+- **Backend:** Ruby on Rails, REST APIs, microservices
+- **Frontend:** React, Next.js, Hotwire, SASS
+- **Databases:** PostgreSQL, MySQL
+- **DevOps:** Docker, CI/CD pipelines, deployments
+- **Testing:** RSpec, automation testing
+
+## 🚀 Features
+
+The portfolio includes the following interactive sections:
+
+### **Intro**
+- Professional profile introduction with animated typewriter effect
+- Contact information and social media links
+- Dynamic particle background animation
+
+### **Experience**
+- Detailed work history and professional background
+- Companies worked with and roles undertaken
+- Key accomplishments and responsibilities
+
+### **Education**
+- Academic credentials and certifications
+- Educational institutions attended
+- Relevant coursework and achievements
+
+### **Skills**
+- Technical skills in various technologies
+- Proficiency indicators
+- Skills include: Ruby, Rails, React, Next.js, JavaScript, PostgreSQL, MySQL, Docker, SASS, Bootstrap, and more
+
+### **Projects**
+- Showcase of notable projects including:
+  - **ListEngine Auction Platform** - High-performance real-time bidding system
+  - **Healthcare Management System** - HIPAA-compliant clinic management solution
+  - **Shipping Logistics Dashboard** - Advanced logistics tracking platform
+- Project descriptions, technologies used, and live/GitHub links
+
+### **Achievements**
+- Professional recognition and awards
+- Certifications and accomplishments
+- Community contributions
+
+### **Responsive Design**
+- Mobile-friendly sidebar navigation
+- Smooth section transitions
+- Optimized for all device sizes
+
+## 🛠 Tech Stack
+
+- **React 19** - UI framework
+- **React Scripts 5.0** - Build tooling
+- **FontAwesome** - Icon library
+- **React Simple Typewriter** - Text animation
+- **SASS** - Styling
+- **Create React App** - Project scaffolding
+
+## 📦 Available Scripts
 
 ### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Runs the app in development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view in your browser.\
+Changes auto-reload, and lint errors appear in the console.
 
 ### `npm run build`
-
 Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Optimized with minification and hashed filenames for best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### `npm run deploy`
+Deploys the application to GitHub Pages using gh-pages package.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### `npm test`
+Launches the interactive test runner in watch mode.
 
-### `npm run eject`
+## 📱 Getting Started
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/mukeshmahara/mukeshmahara.github.io.git
+   cd mukeshmahara.github.io
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. **Start development server:**
+   ```bash
+   npm start
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
 
-## Learn More
+5. **Deploy to GitHub Pages:**
+   ```bash
+   npm run deploy
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🌐 Deployment
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+This portfolio is deployed using GitHub Pages with a custom domain. The deployment process:
+1. Run `npm run build` to create optimized production build
+2. Run `npm run deploy` to push to gh-pages branch
+3. GitHub Pages automatically serves the site
 
-### Code Splitting
+## 📞 Contact
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Feel free to reach out through the portfolio website or connect with me on:
+- **LinkedIn** - Professional network
+- **GitHub** - Code repositories
+- **Email** - Direct contact
+- **Phone** - Available upon request
+
+## 📄 License
+
+This project is open source and available under the MIT License.
 
 ### Analyzing the Bundle Size
 

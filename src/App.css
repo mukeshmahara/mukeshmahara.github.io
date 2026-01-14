@@ -122,15 +122,15 @@ html, body {
   transform: translateY(8px);
 }
 
-.mobile-menu-open .mobile-menu-toggle span {
+body.mobile-menu-open .mobile-menu-toggle span {
   background: transparent;
 }
 
-.mobile-menu-open .mobile-menu-toggle span::before {
+body.mobile-menu-open .mobile-menu-toggle span::before {
   transform: rotate(45deg);
 }
 
-.mobile-menu-open .mobile-menu-toggle span::after {
+body.mobile-menu-open .mobile-menu-toggle span::after {
   transform: rotate(-45deg);
 }
 
@@ -857,11 +857,11 @@ h3 {
     box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
   }
 
-  .mobile-menu-open .sidebar {
+  body.mobile-menu-open .sidebar {
     transform: translateX(0);
   }
 
-  .mobile-menu-open .overlay {
+  body.mobile-menu-open .overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -869,6 +869,59 @@ h3 {
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 50;
+  }
+
+  /* Ensure mobile sidebar navigation is interactive */
+  .sidebar .sidebar-nav {
+    position: relative;
+    z-index: 101;
+    touch-action: manipulation;
+  }
+
+  .sidebar .sidebar-nav li {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(52, 152, 219, 0.2);
+    tap-highlight-color: rgba(52, 152, 219, 0.2);
+  }
+
+  /* Navigation button styles for mobile */
+  .nav-button {
+    display: block;
+    width: 100%;
+    padding: 15px 20px;
+    background: none;
+    border: none;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  .nav-button::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 0;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+  }
+
+  .nav-button:hover::before {
+    width: 100%;
+  }
+
+  .nav-button.active {
+    background-color: rgba(52, 152, 219, 0.2);
+  }
+
+  .nav-button.active::before {
+    width: 100%;
   }
 
   /* Adjust layout */
