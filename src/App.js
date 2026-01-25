@@ -1,37 +1,43 @@
-import { useState, useEffect } from 'react';
-import './App.css';
-import ParticleBackground from './Components/ParticleBackground';
-import Projects from './Components/Projects';
-import Intro from './Components/Intro';
-import Experience from './Components/Experience';
-import Education from './Components/Education';
-import Skills from './Components/Skills';
-import Achievements from './Components/Achievements';
-import Sidebar from './Components/Sidebar';
+import { useState, useEffect } from "react";
+import "./App.css";
+import ParticleBackground from "./Components/ParticleBackground";
+import Projects from "./Components/Projects";
+import Intro from "./Components/Intro";
+import Experience from "./Components/Experience";
+import Education from "./Components/Education";
+import Skills from "./Components/Skills";
+import Achievements from "./Components/Achievements";
+import Sidebar from "./Components/Sidebar";
+import ChatBot from "./Components/ChatBot";
 
 function App() {
-  const [activeSection, setActiveSection] = useState('intro');
+  const [activeSection, setActiveSection] = useState("intro");
   const [menuOpen, setMenuOpen] = useState(false);
 
-  console.log('App render - activeSection:', activeSection, 'menuOpen:', menuOpen); // Debug log
+  console.log(
+    "App render - activeSection:",
+    activeSection,
+    "menuOpen:",
+    menuOpen,
+  ); // Debug log
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
     if (!menuOpen) {
-      document.body.classList.add('mobile-menu-open');
+      document.body.classList.add("mobile-menu-open");
     } else {
-      document.body.classList.remove('mobile-menu-open');
+      document.body.classList.remove("mobile-menu-open");
     }
   };
 
   const closeMenu = () => {
-    console.log('closeMenu called, menuOpen:', menuOpen); // Debug log
+    console.log("closeMenu called, menuOpen:", menuOpen); // Debug log
     setMenuOpen(false);
-    document.body.classList.remove('mobile-menu-open');
+    document.body.classList.remove("mobile-menu-open");
   };
 
   const handleSetActiveSection = (section) => {
-    console.log('setActiveSection called with:', section); // Debug log
+    console.log("setActiveSection called with:", section); // Debug log
     setActiveSection(section);
   };
 
@@ -39,45 +45,41 @@ function App() {
     // Fix for mobile viewport height (addressing the 100vh issue on mobile)
     const setVh = () => {
       let vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
     };
 
     setVh();
-    window.addEventListener('resize', setVh);
+    window.addEventListener("resize", setVh);
 
     return () => {
-      window.removeEventListener('resize', setVh);
+      window.removeEventListener("resize", setVh);
     };
   }, []);
   // Content to display based on selected section
   const renderContent = () => {
     switch (activeSection) {
-      case 'intro':
+      case "intro":
         return <Intro />;
-      case 'projects':
-        return (
-          
-            <Projects />
-          
-        );
-      case 'experience':
+      case "projects":
+        return <Projects />;
+      case "experience":
         return <Experience />;
-      case 'education':
+      case "education":
         return <Education />;
-      case 'skills':
+      case "skills":
         return <Skills />;
-      case 'achievements':
+      case "achievements":
         return <Achievements />;
+
       default:
         return (
           <div className="content-section">
-            <h2>Welcome</h2>
-            <p>Select a section from the sidebar to view more information.</p>
+            <h2>Comming Soon</h2>
+            <p>We are working on it.</p>
           </div>
         );
     }
   };
-
 
   return (
     <div className="App">
@@ -89,17 +91,17 @@ function App() {
 
       <div className="layout">
         {/* Sidebar */}
-        <Sidebar 
-          activeSection={activeSection} 
-          setActiveSection={handleSetActiveSection} 
+        <Sidebar
+          activeSection={activeSection}
+          setActiveSection={handleSetActiveSection}
           closeMenu={closeMenu}
         />
 
         {/* Main Content */}
         <main className="content">
           <ParticleBackground />
-
           {renderContent()}
+          <ChatBot />;
         </main>
       </div>
     </div>

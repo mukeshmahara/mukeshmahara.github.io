@@ -76,6 +76,15 @@ const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
           >
             Achievements
           </button>
+
+          <button
+            type="button"
+            className={`nav-button ${activeSection === "New features" ? "active" : ""}`}
+            onClick={(e) => handleNavClick("New features", e)}
+            onTouchEnd={(e) => handleTouchEnd("New features", e)}
+          >
+            New features
+          </button>
         </div>
       </nav>
 
