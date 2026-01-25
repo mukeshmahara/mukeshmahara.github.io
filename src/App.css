@@ -14,7 +14,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
@@ -33,28 +34,40 @@ html, body {
 
 /* Animated background effect */
 .App::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
-    radial-gradient(circle at 15% 15%, rgba(17, 53, 162, 0.2) 0%, transparent 20%),
-    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.1) 0%, transparent 25%),
-    linear-gradient(to bottom right, rgba(12, 24, 75, 0.4) 0%, rgba(5, 10, 30, 0.8) 100%);
+  background:
+    radial-gradient(
+      circle at 15% 15%,
+      rgba(17, 53, 162, 0.2) 0%,
+      transparent 20%
+    ),
+    radial-gradient(
+      circle at 85% 85%,
+      rgba(6, 182, 212, 0.1) 0%,
+      transparent 25%
+    ),
+    linear-gradient(
+      to bottom right,
+      rgba(12, 24, 75, 0.4) 0%,
+      rgba(5, 10, 30, 0.8) 100%
+    );
   z-index: -1;
 }
 
 /* Animated grid - with reduced animation for mobile */
 .App::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
+  background:
     linear-gradient(90deg, rgba(7, 25, 43, 0.3) 1px, transparent 1px),
     linear-gradient(rgba(7, 25, 43, 0.3) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -63,8 +76,12 @@ html, body {
 }
 
 @keyframes gridMove {
-  0% { background-position: 0 0; }
-  100% { background-position: 40px 40px; }
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 40px;
+  }
 }
 
 /* Main layout structure */
@@ -106,7 +123,7 @@ html, body {
 
 .mobile-menu-toggle span::before,
 .mobile-menu-toggle span::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 100%;
   height: 100%;
@@ -146,7 +163,9 @@ body.mobile-menu-open .mobile-menu-toggle span::after {
   box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
   position: relative;
   z-index: 10;
-  transition: transform 0.3s ease, width 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    width 0.3s ease;
 }
 
 .sidebar-header {
@@ -175,29 +194,72 @@ body.mobile-menu-open .mobile-menu-toggle span::after {
   box-shadow: 0 0 30px rgba(46, 204, 113, 0.6);
 }
 
+/* =========== SIDEBAR NAVIGATION FIX =========== */
+
+/* Fix sidebar nav structure for button-based navigation */
 .sidebar-nav {
   flex-grow: 1;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  padding: 10px;
 }
 
-.sidebar-nav ul {
-  list-style-type: none;
-  padding: 0;
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.nav-item {
+  list-style: none;
   margin: 0;
+  padding: 0;
 }
 
-.sidebar-nav li {
+/* Navigation button styles for both mobile and desktop */
+.nav-button {
+  display: block;
+  width: 100%;
   padding: 15px 20px;
-  cursor: pointer;
-  transition: all 0.3s;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  color: white;
   text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 0 8px 8px 0;
 }
 
-.sidebar-nav li::before {
-  content: '';
+.nav-button:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+  border-left-color: var(--primary-color);
+  padding-left: 25px;
+}
+
+.nav-button.active {
+  background-color: rgba(52, 152, 219, 0.2);
+  border-left-color: var(--primary-color);
+  font-weight: 600;
+}
+
+.nav-button.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: var(--primary-color);
+}
+
+.nav-button::after {
+  content: "";
   position: absolute;
   left: 0;
   bottom: 0;
@@ -207,22 +269,185 @@ body.mobile-menu-open .mobile-menu-toggle span::after {
   transition: width 0.3s ease;
 }
 
-.sidebar-nav li:hover::before {
+.nav-button:hover::after {
   width: 100%;
 }
 
-.sidebar-nav li.active {
-  background-color: rgba(52, 152, 219, 0.2);
-}
-
-.sidebar-nav li.active::before {
-  width: 100%;
-}
-
-.sidebar-footer {
-  padding: 15px;
+/* Sidebar contact, social, and footer styles */
+.sidebar-contact {
+  padding: 20px;
   border-top: 1px solid rgba(52, 152, 219, 0.3);
-  font-size: 0.8rem;
+  border-bottom: 1px solid rgba(52, 152, 219, 0.3);
+  margin: 20px 0;
+}
+
+.contact-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #bdc3c7;
+  font-size: 14px;
+}
+
+.contact-item i {
+  color: var(--primary-color);
+  width: 20px;
+}
+
+.sidebar-social {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.social-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  color: #bdc3c7;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  color: var(--primary-color);
+  transform: translateY(-3px);
+}
+
+.social-icon {
+  font-size: 20px;
+}
+
+.social-text {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Update sidebar header */
+.sidebar-header h3 {
+  margin: 15px 0 5px 0;
+  font-size: 1.5rem;
+  background: linear-gradient(
+    45deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-header .subtitle {
+  color: #95a5a6;
+  font-size: 0.9rem;
+  margin: 0;
+  font-weight: 300;
+}
+
+/* Mobile menu overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 99;
+  display: none;
+}
+
+/* =========== DESKTOP SPECIFIC FIXES =========== */
+
+@media (min-width: 768px) {
+  /* Ensure desktop sidebar is visible and properly positioned */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    transform: translateX(0) !important;
+    z-index: 10;
+  }
+
+  /* Make content area adjust for sidebar */
+  .content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+  }
+
+  /* Hide mobile menu toggle on desktop */
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+
+  /* Hide overlay on desktop */
+  .overlay {
+    display: none !important;
+  }
+
+  /* Fix layout for desktop */
+  .layout {
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+/* Tablet specific sidebar width */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .sidebar {
+    width: var(--sidebar-width-tablet);
+  }
+
+  .content {
+    margin-left: var(--sidebar-width-tablet);
+    width: calc(100% - var(--sidebar-width-tablet));
+  }
+}
+
+/* Mobile specific styles */
+@media (max-width: 767px) {
+  .overlay {
+    display: block;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar:not(.mobile-open) {
+    transform: translateX(-100%);
+  }
+
+  /* Add body class for mobile menu open state */
+  body.mobile-menu-open {
+    overflow: hidden;
+  }
+
+  body.mobile-menu-open .overlay {
+    display: block;
+  }
+}
+
+/* Remove conflicting old styles */
+.sidebar-nav ul,
+.sidebar-nav li {
+  all: unset;
+}
+
+.sidebar-nav li {
+  all: unset;
 }
 
 /* Content Area Styles */
@@ -238,13 +463,17 @@ body.mobile-menu-open .mobile-menu-toggle span::after {
 }
 
 .content::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 50% 50%, rgba(52, 152, 219, 0.1), transparent 70%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(52, 152, 219, 0.1),
+    transparent 70%
+  );
   pointer-events: none;
   z-index: -1;
 }
@@ -263,7 +492,12 @@ body.mobile-menu-open .mobile-menu-toggle span::after {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: #fff;
 }
 
@@ -306,7 +540,9 @@ h3 {
   object-fit: cover;
   border: 3px solid rgba(52, 152, 219, 0.7);
   box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
-  animation: float 6s ease-in-out infinite, pulse 3s ease-in-out infinite alternate;
+  animation:
+    float 6s ease-in-out infinite,
+    pulse 3s ease-in-out infinite alternate;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -328,14 +564,24 @@ h3 {
 }
 
 @keyframes float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 15px rgba(52, 152, 219, 0.5); }
-  100% { box-shadow: 0 0 25px rgba(52, 152, 219, 0.8); }
+  0% {
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(52, 152, 219, 0.8);
+  }
 }
 
 /* Contact Information */
@@ -412,13 +658,18 @@ h3 {
 }
 
 .project-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(52, 152, 219, 0.1),
+    transparent
+  );
   transition: 0.5s;
   z-index: 1;
 }
@@ -468,7 +719,7 @@ h3 {
 }
 
 .project-title::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   bottom: -5px;
@@ -507,7 +758,7 @@ h3 {
 }
 
 .project-description::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
@@ -697,7 +948,7 @@ h3 {
 }
 
 .mm-logo::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -4px;
   background: linear-gradient(45deg, #3498db, #2ecc71, #3498db);
@@ -707,7 +958,7 @@ h3 {
 }
 
 .mm-logo::after {
-  content: '';
+  content: "";
   position: absolute;
   inset: 2px;
   background-color: rgba(7, 11, 25, 0.9);
@@ -715,8 +966,9 @@ h3 {
   z-index: -1;
 }
 
-.m-left, .m-right {
-  font-family: 'Audiowide', sans-serif;
+.m-left,
+.m-right {
+  font-family: "Audiowide", sans-serif;
   font-size: 36px;
   font-weight: bold;
   color: rgba(52, 152, 219, 1);
@@ -738,12 +990,16 @@ h3 {
 }
 
 @keyframes rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes glow-blue {
-  0% { 
+  0% {
     color: rgba(52, 152, 219, 1);
     text-shadow: 0 0 8px rgba(52, 152, 219, 0.8);
   }
@@ -779,7 +1035,7 @@ h3 {
   .content-section {
     padding: 40px;
   }
-  
+
   .projects-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -803,33 +1059,33 @@ h3 {
     height: 100px;
     width: 100px;
   }
-  
+
   h1 {
     font-size: 1.8rem;
   }
-  
+
   h2 {
     font-size: 1.6rem;
   }
-  
+
   .project-card {
     min-height: 400px;
   }
-  
+
   .content-section {
     padding: 25px;
   }
-  
+
   .profile-header {
     margin-bottom: 20px;
   }
-  
+
   .profile-image {
     width: 100px;
     height: 100px;
     margin-right: 20px;
   }
-  
+
   .projects-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
@@ -845,7 +1101,7 @@ h3 {
   .mobile-menu-toggle {
     display: block;
   }
-  
+
   .sidebar {
     position: fixed;
     top: 0;
@@ -902,7 +1158,7 @@ h3 {
   }
 
   .nav-button::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     bottom: 0;
@@ -928,39 +1184,39 @@ h3 {
   .layout {
     flex-direction: column;
   }
-  
+
   .content {
     width: 100%;
     padding: var(--content-padding);
     padding-top: 70px; /* Space for the menu button */
   }
-  
+
   .content-section {
     padding: 20px;
   }
-  
+
   /* Adjust profile section */
   .profile-header {
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
-  
+
   .profile-image {
     margin-right: 0;
     margin-bottom: 20px;
     width: 100px;
     height: 100px;
   }
-  
+
   h1 {
     font-size: 1.8rem;
   }
-  
+
   .typewriter-container {
     font-size: 1rem;
   }
-  
+
   /* Adjust contact info */
   .contact-row {
     flex-direction: column;
@@ -969,37 +1225,42 @@ h3 {
   .contact-item {
     margin-bottom: 10px;
   }
-  
+
   /* Adjust project grid */
   .projects-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   /* Adjust experience section */
-  .company-info, .school-info {
+  .company-info,
+  .school-info {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .location {
     margin-top: 5px;
   }
-  
+
   /* Optimize animations for mobile */
   .App::after {
     background-size: 30px 30px; /* Smaller grid pattern */
   }
-  
+
   @keyframes gridMove {
-    0% { background-position: 0 0; }
-    100% { background-position: 30px 30px; }
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 30px 30px;
+    }
   }
-  
+
   .profile-pic {
     animation: pulse 3s ease-in-out infinite alternate; /* Remove float animation on mobile */
   }
-  
+
   .project-card:hover {
     transform: translateY(-3px); /* Smaller hover effect */
   }
@@ -1011,34 +1272,34 @@ h3 {
     padding: 10px;
     padding-top: 70px;
   }
-  
+
   .content-section {
     padding: 15px;
   }
-  
+
   h1 {
     font-size: 1.6rem;
   }
-  
+
   h2 {
     font-size: 1.4rem;
     margin-bottom: 15px;
   }
-  
+
   .project-image-container {
     height: 150px;
   }
-  
+
   .project-link {
     padding: 6px 10px;
     font-size: 0.8rem;
   }
-  
+
   .profile-image {
     width: 80px;
     height: 80px;
   }
-  
+
   .typewriter-container {
     min-height: 24px;
     font-size: 0.9rem;
@@ -1052,31 +1313,37 @@ h3 {
 
 /* Optimize for print */
 @media print {
-  .App::before, .App::after {
+  .App::before,
+  .App::after {
     display: none;
   }
-  
+
   .sidebar {
     display: none;
   }
-  
+
   .content {
     overflow: visible;
     background: white;
     color: black;
   }
-  
+
   .content-section {
     background: white;
     color: black;
     box-shadow: none;
     border: none;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: black;
   }
-  
+
   a {
     color: black;
   }
@@ -1088,7 +1355,8 @@ h3 {
   }
 
   /* Simplify animations for print */
-  .profile-pic, .profile-logo {
+  .profile-pic,
+  .profile-logo {
     animation: none;
     border: 1px solid #000;
     box-shadow: none;
