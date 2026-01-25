@@ -11,6 +11,7 @@ import {
   Trash2,
   Sparkles,
 } from "lucide-react";
+import { llamaConfig } from "../utils/llamaConfig";
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,12 +32,48 @@ const ChatBot = () => {
 
   const messagesEndRef = useRef(null);
 
+  const callLocalLlamaAPI = async (prompt, onToken) => {
+    const response = await fetch(llamaConfig.getActiveEndpoint(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "phi3:mini",
+        prompt,
+        stream: true,
+      }),
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+
+    let fullText = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split("\n").filter(Boolean);
+
+      for (const line of lines) {
+        const json = JSON.parse(line);
+
+        if (json.response) {
+          fullText += json.response;
+          onToken(json.response); // 👈 live update
+        }
+      }
+    }
+
+    return fullText;
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = () => {
-    if (!inputText.trim()) return;
+  const handleSend = async () => {
+    if (!inputText.trim() || isLoading) return;
 
     const userMessage = {
       id: messages.length + 1,
@@ -48,25 +85,47 @@ const ChatBot = () => {
       }),
     };
 
+    // Add user message
     setMessages((prev) => [...prev, userMessage]);
     setInputText("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          text: "Thanks for your question! Mukesh is a Full Stack Developer skilled in React, Rails, and AI-powered systems.",
-          sender: "bot",
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
+    // Prepare empty bot message for streaming
+    const botMessageId = userMessage.id + 1;
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: botMessageId,
+        text: "",
+        sender: "bot",
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+    ]);
+
+    try {
+      await callLocalLlamaAPI(userMessage.text, (token) => {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === botMessageId ? { ...msg, text: msg.text + token } : msg,
+          ),
+        );
+      });
+    } catch (error) {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === botMessageId
+            ? { ...msg, text: "⚠️ Error connecting to AI model." }
+            : msg,
+        ),
+      );
+      console.error(error);
+    } finally {
       setIsLoading(false);
-    }, 1200);
+    }
   };
 
   return (
