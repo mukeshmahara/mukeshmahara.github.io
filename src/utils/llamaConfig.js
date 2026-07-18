@@ -1,8 +1,11 @@
 // utils/llamaConfig.js
+const isDevelopment = process.env.NODE_ENV === "development";
+
 export const llamaConfig = {
   // Ollama default endpoint
-  ollamaEndpoint: "http://localhost:11434/api/generate",
-
+  ollamaEndpoint: isDevelopment
+    ? "http://localhost:11434/api/generate"
+    : "https://ai.mukeshmahara.com.np/api/generate",
   // llama.cpp server endpoint
   llamaCppEndpoint: "http://localhost:8000/v1/completions",
 
