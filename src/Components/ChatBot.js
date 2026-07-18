@@ -35,7 +35,12 @@ const ChatBot = () => {
   const callLocalLlamaAPI = async (prompt, onToken) => {
     const response = await fetch(llamaConfig.getActiveEndpoint(), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "https://mukeshmahara.com.np",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
       body: JSON.stringify({
         model: "phi3:mini",
         prompt,
