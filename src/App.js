@@ -87,7 +87,7 @@ function App() {
       <button className="mobile-menu-toggle" onClick={toggleMenu}>
         <span></span>
       </button>
-      {menuOpen && <div className="overlay" onClick={closeMenu}></div>}
+      {menuOpen && <div className="" onClick={closeMenu}></div>}
 
       <div className="layout">
         {/* Sidebar */}

@@ -1177,6 +1177,7 @@ h3 {
   }
 
   .nav-button.active::before {
+    height: 2px;
     width: 100%;
   }
 
