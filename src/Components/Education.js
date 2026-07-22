@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const Education = () => {
   return (
@@ -10,7 +10,9 @@ const Education = () => {
           <h3>Computer Science and Information Technology</h3>
           <div className="school-info">
             <span className="school-name">Madan Bhandari Memorial College</span>
-            <span className="location">Bhaktapur, Kathmandu, Nepal</span>
+            <span className="location">
+              Bijulibajar, Anamnagar, Kathmandu, Nepal
+            </span>
           </div>
           <div className="duration">06/2016 - 07/2020</div>
         </div>
@@ -21,9 +23,22 @@ const Education = () => {
           <h3>Science</h3>
           <div className="school-info">
             <span className="school-name">Radiant Higher Secondary School</span>
-            <span className="location">Bhimfedistanpat, Kathmandu</span>
+            <span className="location">Bhimdatta, Kanchanpur, Nepal</span>
           </div>
           <div className="duration">04/2013 - 12/2015</div>
+        </div>
+      </div>
+
+      <div className="education-item">
+        <div className="education-header">
+          <h3>SLC</h3>
+          <div className="school-info">
+            <span className="school-name">
+              Shree Everest Boarding High School
+            </span>
+            <span className="location">Belauri-6, Kanchanpur, Nepal</span>
+          </div>
+          <div className="duration">04/1999 - 12/2012</div>
         </div>
       </div>
     </div>

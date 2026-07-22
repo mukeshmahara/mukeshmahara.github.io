@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const Skills = () => {
   return (
@@ -21,6 +21,8 @@ const Skills = () => {
         <div className="skill-tag">Deployments</div>
         <div className="skill-tag">Test and Automation</div>
         <div className="skill-tag">Rspec</div>
+
+        <div className="skill-tag">AWS EC2 S3</div>
       </div>
     </div>
   );
