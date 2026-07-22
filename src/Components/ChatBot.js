@@ -37,8 +37,6 @@ const ChatBot = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "https://mukeshmahara.com.np",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
       },
       body: JSON.stringify({
         model: "phi3:mini",
