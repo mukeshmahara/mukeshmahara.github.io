@@ -13,6 +13,8 @@ export function useVoiceAssistant(onNavigate) {
   const recognitionRef = useRef(null);
   const voiceRef = useRef(null);
   const manualStopRef = useRef(false);
+  const restartingRef = useRef(false);
+  const isListeningRef = useRef(false);
 
   const supported = useMemo(() => isSpeechSupported(), []);
 
@@ -47,6 +49,11 @@ export function useVoiceAssistant(onNavigate) {
     };
   }, []);
 
+  const updateListeningState = useCallback((value) => {
+    isListeningRef.current = value;
+    setIsListening(value);
+  }, []);
+
   const speakReply = useCallback((text) => {
     if (
       !text ||
@@ -73,13 +80,17 @@ export function useVoiceAssistant(onNavigate) {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
-    setIsListening(false);
+    updateListeningState(false);
     setStatusMessage("Voice assistant paused");
-  }, []);
+  }, [updateListeningState]);
 
   const startListening = useCallback(() => {
     if (!supported) {
       setErrorMessage("Speech recognition is not supported in this browser");
+      return;
+    }
+
+    if (isListeningRef.current || restartingRef.current) {
       return;
     }
 
@@ -90,12 +101,16 @@ export function useVoiceAssistant(onNavigate) {
     }
 
     manualStopRef.current = false;
+    restartingRef.current = false;
+    updateListeningState(true);
+    setStatusMessage("Listening...");
     try {
       recognition.start();
     } catch (error) {
+      updateListeningState(false);
       setErrorMessage("Unable to start the microphone right now.");
     }
-  }, [supported]);
+  }, [supported, updateListeningState]);
 
   useEffect(() => {
     if (!supported) {
@@ -112,28 +127,32 @@ export function useVoiceAssistant(onNavigate) {
     recognition.interimResults = false;
 
     recognition.onstart = () => {
-      setIsListening(true);
+      restartingRef.current = false;
+      updateListeningState(true);
       setStatusMessage("Listening...");
       setErrorMessage("");
     };
 
     recognition.onerror = (event) => {
-      setIsListening(false);
+      restartingRef.current = false;
+      updateListeningState(false);
       setErrorMessage(`Speech error: ${event.error}`);
       setStatusMessage("Voice assistant unavailable");
     };
 
     recognition.onend = () => {
-      setIsListening(false);
       if (manualStopRef.current) {
+        updateListeningState(false);
         setStatusMessage("Voice assistant paused");
         return;
       }
 
-      setStatusMessage("Restarting listening...");
+      restartingRef.current = true;
       try {
         recognition.start();
       } catch (error) {
+        restartingRef.current = false;
+        updateListeningState(false);
         setErrorMessage("Unable to restart listening automatically.");
         setStatusMessage("Voice assistant paused");
       }
