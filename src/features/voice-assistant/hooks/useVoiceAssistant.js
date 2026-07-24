@@ -10,6 +10,7 @@ export function useVoiceAssistant(onNavigate) {
   const [errorMessage, setErrorMessage] = useState("");
   const [lastTranscript, setLastTranscript] = useState("");
   const [aiReply, setAiReply] = useState("");
+  const [isPendingResponse, setIsPendingResponse] = useState(false);
   const recognitionRef = useRef(null);
   const voiceRef = useRef(null);
   const manualStopRef = useRef(false);
@@ -185,6 +186,7 @@ export function useVoiceAssistant(onNavigate) {
 
       setLastTranscript(transcript);
       setStatusMessage("Thinking...");
+      setIsPendingResponse(true);
 
       try {
         const reply = await getOllamaResponse(transcript);
@@ -196,6 +198,8 @@ export function useVoiceAssistant(onNavigate) {
           "Could not reach Ollama. Make sure it is running locally.",
         );
         setStatusMessage("Response failed");
+      } finally {
+        setIsPendingResponse(false);
       }
     };
 
@@ -220,6 +224,7 @@ export function useVoiceAssistant(onNavigate) {
     errorMessage,
     lastTranscript,
     aiReply,
+    isPendingResponse,
     startListening,
     stopListening,
   };
