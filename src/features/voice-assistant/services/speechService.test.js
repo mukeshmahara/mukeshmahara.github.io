@@ -1,6 +1,6 @@
 import { getOllamaResponse, isSpeechSupported } from "./speechService";
 
-describe("voice assistant service", () => {
+describe("AI assistant service", () => {
   it("detects browser speech support when the API exists", () => {
     const original = window.webkitSpeechRecognition;
     window.webkitSpeechRecognition = function WebkitSpeechRecognition() {};

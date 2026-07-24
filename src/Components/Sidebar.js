@@ -83,7 +83,7 @@ const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
             onClick={(e) => handleNavClick("voice-assistant", e)}
             onTouchEnd={(e) => handleTouchEnd("voice-assistant", e)}
           >
-            Voice Assistant
+            AI Assistant
           </button>
         </div>
       </nav>

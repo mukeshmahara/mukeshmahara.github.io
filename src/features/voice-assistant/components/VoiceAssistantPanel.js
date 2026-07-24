@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useVoiceAssistant } from "../hooks/useVoiceAssistant";
 
 function VoiceAssistantPanel({ onNavigate }) {
@@ -8,25 +8,98 @@ function VoiceAssistantPanel({ onNavigate }) {
     errorMessage,
     lastTranscript,
     aiReply,
+    isPendingResponse,
     startListening,
     stopListening,
   } = useVoiceAssistant(onNavigate);
+
+  const [typedTranscript, setTypedTranscript] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [typedReply, setTypedReply] = useState("");
+  const [isReplyTyping, setIsReplyTyping] = useState(false);
+
+  useEffect(() => {
+    if (!lastTranscript) {
+      setTypedTranscript("");
+      setIsTyping(false);
+      return;
+    }
+
+    const text = `You: ${lastTranscript}`;
+    let index = 0;
+    setTypedTranscript("");
+    setIsTyping(true);
+
+    const interval = window.setInterval(() => {
+      index += 1;
+      setTypedTranscript(text.slice(0, index));
+      if (index >= text.length) {
+        setIsTyping(false);
+        window.clearInterval(interval);
+      }
+    }, 30);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [lastTranscript]);
+
+  useEffect(() => {
+    if (!aiReply) {
+      setTypedReply("");
+      setIsReplyTyping(false);
+      return;
+    }
+
+    const text = aiReply.trim();
+    let index = 0;
+    setTypedReply("");
+    setIsReplyTyping(true);
+
+    const interval = window.setInterval(() => {
+      index += 1;
+      setTypedReply(text.slice(0, index));
+      if (index >= text.length) {
+        setIsReplyTyping(false);
+        window.clearInterval(interval);
+      }
+    }, 24);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [aiReply]);
 
   return (
     <div
       className="voice-assistant-panel"
       role="region"
-      aria-label="Voice assistant"
+      aria-label="AI assistant"
     >
       <div className="voice-assistant-header">
-        <h3>Voice Assistant</h3>
-        <span className={`voice-dot ${isListening ? "listening" : ""}`} />
+        <h3>AI Assistant</h3>
+        <div
+          className={`voice-avatar ${isListening ? "listening" : ""}`}
+          aria-label={isListening ? "Listening" : "Assistant idle"}
+        >
+          <span>AI</span>
+        </div>
       </div>
       <p className="voice-status">{statusMessage}</p>
-      <p className="voice-transcript">
-        {lastTranscript ? `You: ${lastTranscript}` : "No speech captured yet."}
+      <p className={`voice-transcript ${isTyping ? "typing" : ""}`}>
+        {typedTranscript || "No speech captured yet."}
       </p>
-      {aiReply ? <p className="voice-reply">{aiReply}</p> : null}
+      {isPendingResponse ? (
+        <div className="voice-skeleton">
+          <div className="voice-skeleton-line short" />
+          <div className="voice-skeleton-line" />
+          <div className="voice-skeleton-line long" />
+        </div>
+      ) : aiReply ? (
+        <p className={`voice-reply ${isReplyTyping ? "typing" : ""}`}>
+          {typedReply || aiReply}
+        </p>
+      ) : null}
       {errorMessage ? <p className="voice-error">{errorMessage}</p> : null}
       <div className="voice-actions">
         <button type="button" onClick={startListening}>
