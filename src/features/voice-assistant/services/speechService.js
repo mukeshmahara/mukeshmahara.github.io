@@ -17,7 +17,7 @@ export async function getOllamaResponse(prompt, model = "phi3:mini") {
     },
     body: JSON.stringify({
       model,
-      prompt: `You are a helpful assistant for Mukesh's portfolio. Respond briefly and naturally.\n\nUser: ${prompt}\nAssistant:`,
+      prompt: `You are a helpful assistant for Mukesh's Mahara a full stack software engineer. Respond in a warm, natural conversational tone. Use short, friendly sentences and avoid robotic phrasing.\n\nUser: ${prompt}\nAssistant:`,
       stream: false,
       options: {
         temperature: 0.7,

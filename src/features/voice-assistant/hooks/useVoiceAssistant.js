@@ -11,8 +11,41 @@ export function useVoiceAssistant(onNavigate) {
   const [lastTranscript, setLastTranscript] = useState("");
   const [aiReply, setAiReply] = useState("");
   const recognitionRef = useRef(null);
+  const voiceRef = useRef(null);
+  const manualStopRef = useRef(false);
 
   const supported = useMemo(() => isSpeechSupported(), []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      return undefined;
+    }
+
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) {
+        return;
+      }
+
+      const preferredVoice =
+        voices.find((voice) =>
+          /Google US English|Microsoft David|Microsoft Zira|Samantha|Daniel|Alloy/i.test(
+            voice.name,
+          ),
+        ) ||
+        voices.find((voice) => voice.lang?.startsWith("en")) ||
+        voices[0];
+
+      voiceRef.current = preferredVoice;
+    };
+
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
 
   const speakReply = useCallback((text) => {
     if (
@@ -26,12 +59,17 @@ export function useVoiceAssistant(onNavigate) {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-US";
-    utterance.rate = 1;
+    utterance.volume = 1;
+    utterance.rate = 1.02;
     utterance.pitch = 1;
+    if (voiceRef.current) {
+      utterance.voice = voiceRef.current;
+    }
     window.speechSynthesis.speak(utterance);
   }, []);
 
   const stopListening = useCallback(() => {
+    manualStopRef.current = true;
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
@@ -51,6 +89,7 @@ export function useVoiceAssistant(onNavigate) {
       return;
     }
 
+    manualStopRef.current = false;
     try {
       recognition.start();
     } catch (error) {
@@ -69,7 +108,7 @@ export function useVoiceAssistant(onNavigate) {
     recognitionRef.current = recognition;
 
     recognition.lang = "en-US";
-    recognition.continuous = false;
+    recognition.continuous = true;
     recognition.interimResults = false;
 
     recognition.onstart = () => {
@@ -86,23 +125,42 @@ export function useVoiceAssistant(onNavigate) {
 
     recognition.onend = () => {
       setIsListening(false);
-      setStatusMessage("Voice assistant ready");
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.start();
-        } catch (error) {
-          setErrorMessage("Unable to restart listening automatically.");
-        }
+      if (manualStopRef.current) {
+        setStatusMessage("Voice assistant paused");
+        return;
+      }
+
+      setStatusMessage("Restarting listening...");
+      try {
+        recognition.start();
+      } catch (error) {
+        setErrorMessage("Unable to restart listening automatically.");
+        setStatusMessage("Voice assistant paused");
       }
     };
 
     recognition.onresult = async (event) => {
       const transcript = Array.from(event.results)
+        .slice(event.resultIndex)
         .map((result) => result[0]?.transcript || "")
         .join(" ")
         .trim();
 
       if (!transcript) {
+        return;
+      }
+
+      const normalized = transcript.toLowerCase().trim();
+      const isStopCommand = /\bstop(?: listening)?\b/.test(normalized);
+      if (isStopCommand) {
+        manualStopRef.current = true;
+        if (recognitionRef.current) {
+          recognitionRef.current.stop();
+        }
+        setLastTranscript(transcript);
+        setIsListening(false);
+        setStatusMessage("Listening stopped");
+        setAiReply("Okay, I stopped listening.");
         return;
       }
 
@@ -129,9 +187,12 @@ export function useVoiceAssistant(onNavigate) {
   }, [supported, onNavigate, speakReply]);
 
   useEffect(() => {
-    if (supported) {
-      startListening();
+    if (!supported) {
+      return;
     }
+
+    manualStopRef.current = false;
+    startListening();
   }, [supported, startListening]);
 
   return {
