@@ -1,8 +1,13 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
+jest.mock("./Components/ParticleBackground", () => () => (
+  <div data-testid="particle-background" />
+));
+import App from "./App";
 
-test('renders learn react link', () => {
+test("renders the app shell without the voice feature on the default page", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getAllByText(/intro/i).length).toBeGreaterThan(0);
+  expect(
+    screen.queryByText(/voice assistant/i, { selector: "h3" }),
+  ).not.toBeInTheDocument();
 });

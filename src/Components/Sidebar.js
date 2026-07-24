@@ -79,11 +79,11 @@ const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
 
           <button
             type="button"
-            className={`nav-button ${activeSection === "New features" ? "active" : ""}`}
-            onClick={(e) => handleNavClick("New features", e)}
-            onTouchEnd={(e) => handleTouchEnd("New features", e)}
+            className={`nav-button ${activeSection === "voice-assistant" ? "active" : ""}`}
+            onClick={(e) => handleNavClick("voice-assistant", e)}
+            onTouchEnd={(e) => handleTouchEnd("voice-assistant", e)}
           >
-            New features
+            Voice Assistant
           </button>
         </div>
       </nav>

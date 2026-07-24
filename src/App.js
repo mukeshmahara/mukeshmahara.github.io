@@ -9,6 +9,7 @@ import Skills from "./Components/Skills";
 import Achievements from "./Components/Achievements";
 import Sidebar from "./Components/Sidebar";
 import ChatBot from "./Components/ChatBot";
+import VoiceAssistantFeature from "./features/voice-assistant";
 
 function App() {
   const [activeSection, setActiveSection] = useState("intro");
@@ -74,8 +75,7 @@ function App() {
       default:
         return (
           <div className="content-section">
-            <h2>Comming Soon</h2>
-            <p>We are working on it.</p>
+            <VoiceAssistantFeature onNavigate={handleSetActiveSection} />;
           </div>
         );
     }
@@ -101,7 +101,7 @@ function App() {
         <main className="content">
           <ParticleBackground />
           {renderContent()}
-          <ChatBot />;
+          <ChatBot />
         </main>
       </div>
     </div>
