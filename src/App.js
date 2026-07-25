@@ -71,13 +71,18 @@ function App() {
         return <Skills />;
       case "achievements":
         return <Achievements />;
-
-      default:
+      case "voice-assistant":
         return (
           <div className="content-section">
-            <VoiceAssistantFeature onNavigate={handleSetActiveSection} />;
+            <h2>AI Assistant</h2>
+            <p>
+              The floating AI assistant is available on every page. Click the
+              avatar in the bottom right to start a voice command.
+            </p>
           </div>
         );
+      default:
+        return <Intro />;
     }
   };
 
@@ -102,6 +107,7 @@ function App() {
           <ParticleBackground />
           {renderContent()}
           <ChatBot />
+          <VoiceAssistantFeature onNavigate={handleSetActiveSection} />
         </main>
       </div>
     </div>

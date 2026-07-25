@@ -774,6 +774,239 @@ h6 {
   color: #f8fafc;
 }
 
+.voice-assistant-float {
+  position: fixed;
+  right: 28px;
+  bottom: calc(20px + 62px + 14px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+  z-index: 50;
+}
+
+.voice-assistant-bubble {
+  max-width: 0;
+  width: auto;
+  padding: 0;
+  background: rgba(7, 21, 58, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  backdrop-filter: blur(18px);
+  border-radius: 24px;
+  color: #dbeafe;
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  overflow: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.24s ease,
+    transform 0.24s ease,
+    max-width 0.24s ease,
+    padding 0.24s ease;
+}
+
+.voice-assistant-bubble.visible {
+  max-width: 320px;
+  padding: 16px 18px;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.voice-assistant-bubble-message {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.voice-stop-button {
+  margin-top: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 11px 14px;
+  background: linear-gradient(135deg, #38bdf8, #22c55e);
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.voice-stop-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(34, 197, 94, 0.18);
+}
+
+.voice-avatar-button {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: none;
+  background: radial-gradient(
+    circle at 28% 28%,
+    rgba(56, 189, 248, 0.36),
+    rgba(11, 37, 86, 0.95)
+  );
+  box-shadow: 0 12px 32px rgba(15, 57, 104, 0.36);
+  display: grid;
+  place-items: center;
+  color: #e0f2fe;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform 0.24s ease,
+    box-shadow 0.24s ease;
+}
+
+.voice-avatar-button .voice-waveform {
+  position: absolute;
+  inset: -18px;
+  width: calc(100% + 36px);
+  height: calc(100% + 36px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.voice-avatar-button.active .voice-waveform {
+  opacity: 1;
+}
+
+.voice-avatar-button .voice-waveform span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 22px;
+  background: radial-gradient(
+    circle at 50% 20%,
+    rgba(56, 189, 248, 0.95),
+    rgba(34, 197, 94, 0.12)
+  );
+  border-radius: 999px;
+  transform-origin: center 120%;
+  transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(0.78);
+  animation: waveformLine 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: calc(var(--i) * -0.08s);
+  opacity: 0.75;
+  filter: blur(0.2px);
+}
+
+.voice-avatar-button.active .voice-waveform span {
+  animation-play-state: running;
+}
+
+.voice-avatar-button .voice-waveform span {
+  animation-play-state: paused;
+}
+
+.voice-avatar-button.active {
+  transform: scale(1.08);
+  box-shadow:
+    0 16px 40px rgba(56, 189, 248, 0.35),
+    0 0 28px rgba(34, 197, 94, 0.22);
+}
+
+.voice-avatar-button.active::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(56, 189, 248, 0.2),
+    transparent 55%
+  );
+  animation: waveformPulse 1.5s ease-in-out infinite;
+}
+
+.voice-avatar-button.active::after {
+  content: "";
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(56, 189, 248, 0.22) 0deg 24deg,
+    transparent 24deg 48deg,
+    rgba(34, 197, 94, 0.22) 48deg 72deg,
+    transparent 72deg 96deg,
+    rgba(56, 189, 248, 0.12) 96deg 120deg,
+    transparent 120deg 144deg,
+    rgba(34, 197, 94, 0.08) 144deg 168deg,
+    transparent 168deg 360deg
+  );
+  opacity: 0.65;
+  filter: blur(4px);
+  animation: waveformRotate 3s linear infinite;
+}
+
+@keyframes waveformPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.14);
+    opacity: 0.35;
+  }
+}
+
+@keyframes waveformRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes waveformLine {
+  0%,
+  100% {
+    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(0.72);
+    opacity: 0.55;
+  }
+  20% {
+    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(1.08);
+    opacity: 0.85;
+  }
+  40% {
+    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(0.86);
+    opacity: 0.72;
+  }
+  60% {
+    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(1.35);
+    opacity: 1;
+  }
+  80% {
+    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(0.98);
+    opacity: 0.78;
+  }
+}
+
+@keyframes avatarPulse {
+  0% {
+    transform: scale(0.98);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.16);
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(0.98);
+    opacity: 0.75;
+  }
+}
+
 h1 {
   font-size: 2.2rem;
   margin: 0;
@@ -1638,8 +1871,8 @@ h3 {
 }
 .chat-bot-container {
   position: fixed;
+  right: 28px;
   bottom: 20px;
-  right: 20px;
   z-index: 1000;
   font-family: system-ui, sans-serif;
 }

@@ -13,36 +13,8 @@ function VoiceAssistantPanel({ onNavigate }) {
     stopListening,
   } = useVoiceAssistant(onNavigate);
 
-  const [typedTranscript, setTypedTranscript] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
   const [typedReply, setTypedReply] = useState("");
   const [isReplyTyping, setIsReplyTyping] = useState(false);
-
-  useEffect(() => {
-    if (!lastTranscript) {
-      setTypedTranscript("");
-      setIsTyping(false);
-      return;
-    }
-
-    const text = `You: ${lastTranscript}`;
-    let index = 0;
-    setTypedTranscript("");
-    setIsTyping(true);
-
-    const interval = window.setInterval(() => {
-      index += 1;
-      setTypedTranscript(text.slice(0, index));
-      if (index >= text.length) {
-        setIsTyping(false);
-        window.clearInterval(interval);
-      }
-    }, 30);
-
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, [lastTranscript]);
 
   useEffect(() => {
     if (!aiReply) {
@@ -70,48 +42,59 @@ function VoiceAssistantPanel({ onNavigate }) {
     };
   }, [aiReply]);
 
+  const isAvatarActive = isListening || isPendingResponse || isReplyTyping;
+  const bubbleVisible =
+    isListening || isPendingResponse || aiReply || errorMessage;
+
   return (
     <div
-      className="voice-assistant-panel"
+      className="voice-assistant-float"
       role="region"
-      aria-label="AI assistant"
+      aria-label="Floating voice assistant"
     >
-      <div className="voice-assistant-header">
-        <h3>AI Assistant</h3>
-        <div
-          className={`voice-avatar ${isListening ? "listening" : ""}`}
-          aria-label={isListening ? "Listening" : "Assistant idle"}
-        >
-          <span>AI</span>
-        </div>
-      </div>
-      <p className="voice-status">{statusMessage}</p>
-      <p className={`voice-transcript ${isTyping ? "typing" : ""}`}>
-        {typedTranscript || "No speech captured yet."}
-      </p>
-      {isPendingResponse ? (
-        <div className="voice-skeleton">
-          <div className="voice-skeleton-line short" />
-          <div className="voice-skeleton-line" />
-          <div className="voice-skeleton-line long" />
-        </div>
-      ) : aiReply ? (
-        <p className={`voice-reply ${isReplyTyping ? "typing" : ""}`}>
-          {typedReply || aiReply}
+      <div
+        className={`voice-assistant-bubble ${bubbleVisible ? "visible" : ""}`}
+      >
+        <p className="voice-assistant-bubble-message">
+          {isListening
+            ? "Listening..."
+            : isPendingResponse
+              ? "Thinking..."
+              : typedReply || aiReply || "Tap the assistant to speak"}
         </p>
-      ) : null}
-      {errorMessage ? <p className="voice-error">{errorMessage}</p> : null}
-      <div className="voice-actions">
-        <button type="button" onClick={startListening}>
-          {isListening ? "Listening..." : "Start Voice"}
-        </button>
-        <button type="button" onClick={stopListening}>
-          Stop
-        </button>
+        {errorMessage ? (
+          <p className="voice-error bubble-error">{errorMessage}</p>
+        ) : null}
+        {isListening ? (
+          <button
+            type="button"
+            className="voice-stop-button"
+            onClick={stopListening}
+          >
+            Stop
+          </button>
+        ) : null}
       </div>
-      <p className="voice-hint">
-        Try saying “go to projects” or “show me my experience”.
-      </p>
+
+      <button
+        type="button"
+        className={`voice-avatar-button ${isAvatarActive ? "active" : ""}`}
+        onClick={startListening}
+        aria-label={
+          isListening
+            ? "Listening for voice command"
+            : "Activate voice assistant"
+        }
+      >
+        {isAvatarActive ? (
+          <div className="voice-waveform" aria-hidden="true">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <span key={index} style={{ "--i": index }} />
+            ))}
+          </div>
+        ) : null}
+        <span>AI</span>
+      </button>
     </div>
   );
 }
