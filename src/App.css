@@ -877,29 +877,12 @@ h6 {
 .voice-avatar-button.active .voice-waveform {
   opacity: 1;
 }
-
-.voice-avatar-button .voice-waveform span {
+.voice-avatar-button .voice-waveform {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 4px;
-  height: 22px;
-  background: radial-gradient(
-    circle at 50% 20%,
-    rgba(56, 189, 248, 0.95),
-    rgba(34, 197, 94, 0.12)
-  );
-  border-radius: 999px;
-  transform-origin: center 120%;
-  transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(0.78);
-  animation: waveformLine 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  animation-delay: calc(var(--i) * -0.08s);
-  opacity: 0.75;
-  filter: blur(0.2px);
-}
-
-.voice-avatar-button.active .voice-waveform span {
-  animation-play-state: running;
+  inset: -22px;
+  width: calc(100% + 44px);
+  height: calc(100% + 44px);
+  pointer-events: none;
 }
 
 .voice-avatar-button .voice-waveform span {
@@ -916,80 +899,76 @@ h6 {
 .voice-avatar-button.active::before {
   content: "";
   position: absolute;
-  inset: -12px;
+  inset: -14px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(56, 189, 248, 0.2),
-    transparent 55%
-  );
-  animation: waveformPulse 1.5s ease-in-out infinite;
+  border: 2px solid rgba(56, 189, 248, 0.15);
+  filter: blur(1px);
+  animation: waveRing 2.8s ease-in-out infinite;
 }
 
 .voice-avatar-button.active::after {
   content: "";
   position: absolute;
-  inset: -18px;
+  inset: -24px;
   border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    rgba(56, 189, 248, 0.22) 0deg 24deg,
-    transparent 24deg 48deg,
-    rgba(34, 197, 94, 0.22) 48deg 72deg,
-    transparent 72deg 96deg,
-    rgba(56, 189, 248, 0.12) 96deg 120deg,
-    transparent 120deg 144deg,
-    rgba(34, 197, 94, 0.08) 144deg 168deg,
-    transparent 168deg 360deg
+  background: radial-gradient(
+    circle,
+    rgba(56, 189, 248, 0.18),
+    transparent 70%
   );
-  opacity: 0.65;
-  filter: blur(4px);
-  animation: waveformRotate 3s linear infinite;
+  filter: blur(16px);
+  animation: waveAura 3.2s ease-in-out infinite;
 }
 
-@keyframes waveformPulse {
+@keyframes waveRing {
   0%,
   100% {
     transform: scale(1);
-    opacity: 0.8;
+    border-radius: 48% 52% 49% 51%;
   }
+
+  25% {
+    transform: scale(1.03);
+    border-radius: 54% 46% 55% 45%;
+  }
+
   50% {
-    transform: scale(1.14);
-    opacity: 0.35;
+    transform: scale(1.08);
+    border-radius: 47% 53% 44% 56%;
+  }
+
+  75% {
+    transform: scale(1.04);
+    border-radius: 52% 48% 55% 45%;
   }
 }
 
-@keyframes waveformRotate {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes waveformLine {
+@keyframes waveAura {
   0%,
   100% {
-    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(0.72);
-    opacity: 0.55;
+    transform: scale(1);
+    opacity: 0.45;
   }
-  20% {
-    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(1.08);
-    opacity: 0.85;
+
+  50% {
+    transform: scale(1.15);
+    opacity: 0.9;
   }
-  40% {
-    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(0.86);
-    opacity: 0.72;
-  }
-  60% {
-    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(1.35);
-    opacity: 1;
-  }
-  80% {
-    transform: rotate(calc(var(--i) * 22.5deg)) translateY(-38px) scaleY(0.98);
-    opacity: 0.78;
-  }
+}
+
+.voice-avatar-button.active::after {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(56, 189, 248, 0.18),
+    rgba(34, 197, 94, 0.08),
+    transparent 70%
+  );
+  filter: blur(14px);
+  animation: aura 2.8s ease-in-out infinite;
 }
 
 @keyframes avatarPulse {
