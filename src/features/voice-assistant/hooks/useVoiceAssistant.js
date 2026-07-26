@@ -207,7 +207,7 @@ export function useVoiceAssistant(onNavigate) {
       recognition.stop();
       recognitionRef.current = null;
     };
-  }, [supported, onNavigate, speakReply]);
+  }, [supported, onNavigate, speakReply, updateListeningState]);
 
   useEffect(() => {
     if (!supported) {

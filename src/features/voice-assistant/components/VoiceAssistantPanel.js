@@ -4,9 +4,7 @@ import { useVoiceAssistant } from "../hooks/useVoiceAssistant";
 function VoiceAssistantPanel({ onNavigate }) {
   const {
     isListening,
-    statusMessage,
     errorMessage,
-    lastTranscript,
     aiReply,
     isPendingResponse,
     startListening,
