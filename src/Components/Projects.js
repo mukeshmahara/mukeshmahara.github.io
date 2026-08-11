@@ -91,9 +91,9 @@ const projectsData = [
     description:
       "Developed a scalable healthcare platform for physiotherapy services, including appointment scheduling, patient management, and telehealth features.",
     image: physio,
-    technologies: ["Ruby on Rails", "PostgreSQL", "Bootstrap", "jQuery"],
+    technologies: ["Rails API", "REACT", "PostgreSQL", "Bootstrap", "jQuery"],
     githubLink: "https://github.com/mukeshmahara/ecommerce",
-    liveLink: "https://dev-physio.mukeshmahara.com.np",
+    liveLink: "https://physiohub.mukeshmahara.com.np/",
   },
   {
     id: 10,
