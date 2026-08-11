@@ -95,6 +95,39 @@ const projectsData = [
     githubLink: "https://github.com/mukeshmahara/ecommerce",
     liveLink: "https://dev-physio.mukeshmahara.com.np",
   },
+  {
+    id: 10,
+    title: "Samuhik Samaj",
+    description:
+      "Developed a community management platform for managing samuhas, memberships, executive committees, member roles, contributions, and community activities with secure role-based access control.",
+    image: "https://via.placeholder.com/640x360?text=Samuhik+Samaj",
+    technologies: [
+      "Ruby on Rails",
+      "PostgreSQL",
+      "Tailwind CSS",
+      "Hotwire",
+      "Stimulus",
+    ],
+    githubLink: "https://github.com/mukeshmahara/samuhik-samaj",
+    liveLink: "https://samuhiksamaj.mukeshmahara.com.np",
+  },
+  {
+    id: 11,
+    title: "Donate",
+    description:
+      "Developed a crowdfunding and fundraising platform that enables individuals and organizations to create campaigns, set fundraising goals, collect contributions, track campaign progress, and securely process online payments.",
+    image: "https://via.placeholder.com/640x360?text=Donate",
+    technologies: [
+      "Ruby on Rails",
+      "PostgreSQL",
+      "Tailwind CSS",
+      "Hotwire",
+      "Stimulus",
+      "eSewa",
+    ],
+    githubLink: "https://github.com/mukeshmahara/donate",
+    liveLink: "https://donate.mukeshmahara.com.np",
+  },
 ];
 
 const Projects = () => {
