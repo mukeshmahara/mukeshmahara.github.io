@@ -39,10 +39,10 @@ export default function CouponCheckerComponent() {
   const [winnerDetails, setWinnerDetails] = useState(new Map());
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, found: 0 });
-  const apiEndpoint = "https://prize.ird.gov.np/api/v1/public/winners";
 
   useEffect(() => {
     loadAllWinners();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadAllWinners = async () => {
