@@ -2,7 +2,7 @@ name: Fetch Winners Daily
 
 on:
   schedule:
-    - cron: "0 0 * * *" # Runs daily at midnight UTC
+    - cron: "* * * * *" # Runs every minute
   workflow_dispatch: # Allows manual triggering
 
 jobs:
