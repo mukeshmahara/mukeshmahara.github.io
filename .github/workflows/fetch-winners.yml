@@ -1,21 +1,30 @@
-name: Fetch Winners Daily
+name: Fetch Winners Every Minute
 
 on:
   schedule:
-    - cron: "* * * * *" # Runs every minute
-  workflow_dispatch: # Allows manual triggering
+    - cron: "* * * * *" # Every minute
+  workflow_dispatch: # Manual trigger
 
 jobs:
   fetch-winners:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+    runs-on: ubuntu-24.04 # Pin specific version to avoid auto-migration
 
-      - name: Fetch winner data from IRD API
+    steps:
+      - uses: actions/checkout@v4 # Updated from v3 to v4 (Node.js 20 compatible)
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # Explicitly use Node.js 20
+
+      - name: Create public directory
+        run: mkdir -p public
+
+      - name: Fetch winner data
         run: |
-          mkdir -p public
           curl -s "https://prize.ird.gov.np/api/v1/public/winners?limit=1000&offset=0" > public/winners-data.json
-          echo "Data fetched successfully"
+          echo "✅ Data fetched successfully"
+          echo "Total winners: $(grep -o 'prize_coupon_number' public/winners-data.json | wc -l)"
 
       - name: Configure Git
         run: |
@@ -25,5 +34,5 @@ jobs:
       - name: Commit and push if changed
         run: |
           git add public/winners-data.json
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update: Winner data from IRD API"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update: Winners data $(date +'%Y-%m-%d %H:%M')"
           git push
