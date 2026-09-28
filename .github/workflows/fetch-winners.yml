@@ -1,8 +1,8 @@
-name: Fetch Winners Every Minute
+name: Fetch Winners every day at midnight
 
 on:
   schedule:
-    - cron: "* * * * *" # Every minute
+    - cron: "0 0 * * *" # Every day at mid night
   workflow_dispatch: # Manual trigger
 
 jobs:
