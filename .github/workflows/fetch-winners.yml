@@ -1,0 +1,29 @@
+name: Fetch Winners Daily
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs daily at midnight UTC
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  fetch-winners:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Fetch winner data from IRD API
+        run: |
+          mkdir -p public
+          curl -s "https://prize.ird.gov.np/api/v1/public/winners?limit=1000&offset=0" > public/winners-data.json
+          echo "Data fetched successfully"
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit and push if changed
+        run: |
+          git add public/winners-data.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update: Winner data from IRD API"
+          git push
