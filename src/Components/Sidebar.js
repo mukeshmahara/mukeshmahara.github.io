@@ -79,6 +79,15 @@ const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
 
           <button
             type="button"
+            className={`nav-button ${activeSection === "coupon-checker" ? "active" : ""}`}
+            onClick={(e) => handleNavClick("coupon-checker", e)}
+            onTouchEnd={(e) => handleTouchEnd("coupon-checker", e)}
+          >
+            Prize Checker
+          </button>
+
+          <button
+            type="button"
             className={`nav-button ${activeSection === "voice-assistant" ? "active" : ""}`}
             onClick={(e) => handleNavClick("voice-assistant", e)}
             onTouchEnd={(e) => handleTouchEnd("voice-assistant", e)}

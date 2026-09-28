@@ -10,6 +10,7 @@ import Achievements from "./Components/Achievements";
 import Sidebar from "./Components/Sidebar";
 import ChatBot from "./Components/ChatBot";
 import VoiceAssistantFeature from "./features/voice-assistant";
+import CouponCheckerComponent from "./Components/CouponCheckerComponent";
 
 function App() {
   const [activeSection, setActiveSection] = useState("intro");
@@ -71,6 +72,8 @@ function App() {
         return <Skills />;
       case "achievements":
         return <Achievements />;
+      case "coupon_checker":
+        return <CouponCheckerComponent />;
       case "voice-assistant":
         return (
           <div className="content-section">
@@ -81,6 +84,8 @@ function App() {
             </p>
           </div>
         );
+      case "coupon-checker":
+        return <CouponCheckerComponent />;
       default:
         return <Intro />;
     }
