@@ -1,5 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import "./App.css";
+
 import ParticleBackground from "./Components/ParticleBackground";
 import Projects from "./Components/Projects";
 import Intro from "./Components/Intro";
@@ -11,20 +14,14 @@ import Sidebar from "./Components/Sidebar";
 import ChatBot from "./Components/ChatBot";
 import VoiceAssistantFeature from "./features/voice-assistant";
 import CouponCheckerComponent from "./Components/CouponCheckerComponent";
+import DrawsPage from "./Components/ird/DrawsPage";
 
 function App() {
-  const [activeSection, setActiveSection] = useState("intro");
   const [menuOpen, setMenuOpen] = useState(false);
-
-  console.log(
-    "App render - activeSection:",
-    activeSection,
-    "menuOpen:",
-    menuOpen,
-  ); // Debug log
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
+
     if (!menuOpen) {
       document.body.classList.add("mobile-menu-open");
     } else {
@@ -33,86 +30,73 @@ function App() {
   };
 
   const closeMenu = () => {
-    console.log("closeMenu called, menuOpen:", menuOpen); // Debug log
     setMenuOpen(false);
     document.body.classList.remove("mobile-menu-open");
   };
 
-  const handleSetActiveSection = (section) => {
-    console.log("setActiveSection called with:", section); // Debug log
-    setActiveSection(section);
-  };
-
   useEffect(() => {
-    // Fix for mobile viewport height (addressing the 100vh issue on mobile)
     const setVh = () => {
-      let vh = window.innerHeight * 0.01;
+      const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty("--vh", `${vh}px`);
     };
 
     setVh();
+
     window.addEventListener("resize", setVh);
 
     return () => {
       window.removeEventListener("resize", setVh);
     };
   }, []);
-  // Content to display based on selected section
-  const renderContent = () => {
-    switch (activeSection) {
-      case "intro":
-        return <Intro />;
-      case "projects":
-        return <Projects />;
-      case "experience":
-        return <Experience />;
-      case "education":
-        return <Education />;
-      case "skills":
-        return <Skills />;
-      case "achievements":
-        return <Achievements />;
-      case "coupon_checker":
-        return <CouponCheckerComponent />;
-      case "voice-assistant":
-        return (
-          <div className="content-section">
-            <h2>AI Assistant</h2>
-            <p>
-              The floating AI assistant is available on every page. Click the
-              avatar in the bottom right to start a voice command.
-            </p>
-          </div>
-        );
-      case "coupon-checker":
-        return <CouponCheckerComponent />;
-      default:
-        return <Intro />;
-    }
-  };
 
   return (
     <div className="App">
       <ParticleBackground />
+
       <button className="mobile-menu-toggle" onClick={toggleMenu}>
         <span></span>
       </button>
-      {menuOpen && <div className="" onClick={closeMenu}></div>}
+
+      {menuOpen && <div className="mobile-menu-overlay" onClick={closeMenu} />}
 
       <div className="layout">
-        {/* Sidebar */}
-        <Sidebar
-          activeSection={activeSection}
-          setActiveSection={handleSetActiveSection}
-          closeMenu={closeMenu}
-        />
+        <Sidebar closeMenu={closeMenu} />
 
-        {/* Main Content */}
         <main className="content">
           <ParticleBackground />
-          {renderContent()}
+
+          <Routes>
+            <Route path="/" element={<Intro />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/experience" element={<Experience />} />
+            <Route path="/education" element={<Education />} />
+            <Route path="/skills" element={<Skills />} />
+            <Route path="/achievements" element={<Achievements />} />
+            <Route
+              path="/coupon-checker"
+              element={<CouponCheckerComponent />}
+            />
+            <Route
+              path="/voice-assistant"
+              element={
+                <div className="content-section">
+                  <h2>AI Assistant</h2>
+                  <p>
+                    The floating AI assistant is available on every page. Click
+                    the avatar in the bottom right to start a voice command.
+                  </p>
+                </div>
+              }
+            />
+            <Route path="/draws" element={<DrawsPage />} />
+
+            {/* Unknown URL */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+
           <ChatBot />
-          <VoiceAssistantFeature onNavigate={handleSetActiveSection} />
+
+          <VoiceAssistantFeature />
         </main>
       </div>
     </div>
