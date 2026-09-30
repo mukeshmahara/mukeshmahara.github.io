@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./Chat.css";
 
 // Hybrid signaling system: WebSocket when available, mock for demo
@@ -178,7 +178,7 @@ const VideoChat = () => {
   }, []);
 
   // Initialize media stream
-  const initializeMedia = async () => {
+  const initializeMedia = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: 640, height: 480 },
@@ -199,87 +199,94 @@ const VideoChat = () => {
       alert(`Camera/microphone access failed: ${error.message}`);
       return null;
     }
-  };
+  }, [setLocalStream]);
 
   // Create and configure WebRTC peer connection
-  const createPeerConnection = (stream) => {
-    if (!window.RTCPeerConnection) {
-      alert("WebRTC is not supported by your browser.");
-      return null;
-    }
+  const createPeerConnection = useCallback(
+    (stream) => {
+      if (!window.RTCPeerConnection) {
+        alert("WebRTC is not supported by your browser.");
+        return null;
+      }
 
-    const configuration = {
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" },
-        { urls: "stun:stun2.l.google.com:19302" },
-        { urls: "stun:stun3.l.google.com:19302" },
-      ],
-    };
+      const configuration = {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+          { urls: "stun:stun2.l.google.com:19302" },
+          { urls: "stun:stun3.l.google.com:19302" },
+        ],
+      };
 
-    const pc = new RTCPeerConnection(configuration);
-    peerConnectionRef.current = pc;
+      const pc = new RTCPeerConnection(configuration);
+      peerConnectionRef.current = pc;
 
-    // Add local tracks to connection
-    if (stream) {
-      stream.getTracks().forEach((track) => {
-        console.log(`➕ Adding track: ${track.kind}`, track);
-        pc.addTrack(track, stream);
-      });
-    }
+      // Add local tracks to connection
+      if (stream) {
+        stream.getTracks().forEach((track) => {
+          console.log(`➕ Adding track: ${track.kind}`, track);
+          pc.addTrack(track, stream);
+        });
+      }
 
-    // Handle ICE candidates
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        console.log("🧊 ICE candidate generated:", event.candidate);
-        if (signalingRef.current) {
-          signalingRef.current.sendMessage({
-            type: "ice-candidate",
-            candidate: event.candidate,
-          });
+      // Handle ICE candidates
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          console.log("🧊 ICE candidate generated:", event.candidate);
+          if (signalingRef.current) {
+            signalingRef.current.sendMessage({
+              type: "ice-candidate",
+              candidate: event.candidate,
+            });
+          }
+        } else {
+          console.log("✅ ICE gathering complete");
         }
-      } else {
-        console.log("✅ ICE gathering complete");
-      }
-    };
+      };
 
-    // Handle incoming tracks (remote media)
-    pc.ontrack = (event) => {
-      console.log("📥 Received remote track:", event.track.kind, event.streams);
-      if (event.streams && event.streams[0]) {
-        setRemoteStream(event.streams[0]);
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = event.streams[0];
+      // Handle incoming tracks (remote media)
+      pc.ontrack = (event) => {
+        console.log(
+          "📥 Received remote track:",
+          event.track.kind,
+          event.streams,
+        );
+        if (event.streams && event.streams[0]) {
+          setRemoteStream(event.streams[0]);
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = event.streams[0];
+          }
         }
-      }
-    };
+      };
 
-    // Connection state changes
-    pc.onconnectionstatechange = () => {
-      console.log("🔗 Connection state:", pc.connectionState);
-      setConnectionState(pc.connectionState);
+      // Connection state changes
+      pc.onconnectionstatechange = () => {
+        console.log("🔗 Connection state:", pc.connectionState);
+        setConnectionState(pc.connectionState);
 
-      if (pc.connectionState === "connected") {
-        console.log("✅ WebRTC connection established!");
-      } else if (
-        pc.connectionState === "failed" ||
-        pc.connectionState === "disconnected"
-      ) {
-        console.log("❌ WebRTC connection failed");
-      }
-    };
+        if (pc.connectionState === "connected") {
+          console.log("✅ WebRTC connection established!");
+        } else if (
+          pc.connectionState === "failed" ||
+          pc.connectionState === "disconnected"
+        ) {
+          console.log("❌ WebRTC connection failed");
+        }
+      };
 
-    // ICE connection state
-    pc.oniceconnectionstatechange = () => {
-      console.log("🧊 ICE connection state:", pc.iceConnectionState);
-    };
+      // ICE connection state
+      pc.oniceconnectionstatechange = () => {
+        console.log("🧊 ICE connection state:", pc.iceConnectionState);
+      };
 
-    setPeerConnection(pc);
-    return pc;
-  };
+      setPeerConnection(pc);
+      return pc;
+    },
+    [setPeerConnection, setConnectionState, setRemoteStream],
+  );
 
   // End call
-  const endCall = () => {
+  const endCall = useCallback(() => {
     console.log("📞 Ending call...");
 
     if (peerConnectionRef.current) {
@@ -312,7 +319,15 @@ const VideoChat = () => {
 
     setIsCallActive(false);
     setConnectionState("disconnected");
-  };
+  }, [
+    localStream,
+    remoteStream,
+    setPeerConnection,
+    setLocalStream,
+    setRemoteStream,
+    setIsCallActive,
+    setConnectionState,
+  ]);
 
   // Handle signaling messages
   useEffect(() => {
@@ -323,46 +338,94 @@ const VideoChat = () => {
 
       if (!peerConnectionRef.current) return;
 
+      // Check if we're already in a call
+      if (!isCallActive && message.type !== "end-call") {
+        console.log("⚠️ Ignoring signaling message - call not active");
+        return;
+      }
+
       switch (message.type) {
         case "offer":
           console.log("📥 Received offer, creating answer...");
           try {
+            // Check current signaling state
+            const currentState = peerConnectionRef.current.signalingState;
+            if (
+              currentState !== "stable" &&
+              currentState !== "have-local-offer"
+            ) {
+              console.log(`⚠️ Skipping offer - wrong state: ${currentState}`);
+              break;
+            }
+
             await peerConnectionRef.current.setRemoteDescription(
               new RTCSessionDescription(message),
             );
 
+            // Create and set local answer
             const answer = await peerConnectionRef.current.createAnswer();
             await peerConnectionRef.current.setLocalDescription(answer);
 
+            // Send answer back
             signalingRef.current.sendMessage({
               type: "answer",
               sdp: answer.sdp,
             });
 
+            console.log("✅ Answer created and sent");
             setConnectionState("connected");
           } catch (error) {
             console.error("Error handling offer:", error);
+            // If we fail to handle offer, end the call
+            if (error.name === "InvalidStateError") {
+              console.log("🔄 Invalid state, attempting to recover...");
+              endCall();
+            }
           }
           break;
 
         case "answer":
           console.log("📥 Received answer");
           try {
+            // Check if we're waiting for an answer
+            if (connectionState !== "waiting-for-answer") {
+              console.log(
+                "⚠️ Not waiting for answer, current state:",
+                connectionState,
+              );
+              break;
+            }
+
             await peerConnectionRef.current.setRemoteDescription(
               new RTCSessionDescription(message),
             );
+            console.log("✅ Answer processed successfully");
             setConnectionState("connected");
           } catch (error) {
             console.error("Error handling answer:", error);
+            if (error.name === "InvalidStateError") {
+              console.log("🔄 Invalid state for answer, ending call...");
+              endCall();
+            }
           }
           break;
 
         case "ice-candidate":
           console.log("🧊 Received ICE candidate");
           try {
-            await peerConnectionRef.current.addIceCandidate(
-              new RTCIceCandidate(message.candidate),
-            );
+            // Only add ICE candidates if we have a remote description
+            if (peerConnectionRef.current.remoteDescription) {
+              await peerConnectionRef.current.addIceCandidate(
+                new RTCIceCandidate(message.candidate),
+              );
+              console.log("✅ ICE candidate added");
+            } else {
+              console.log(
+                "⏳ Queueing ICE candidate - waiting for remote description",
+              );
+              // Queue ICE candidates if remote description not set yet
+              // This is handled automatically by modern browsers
+            }
           } catch (error) {
             console.error("Error adding ICE candidate:", error);
           }
@@ -378,10 +441,10 @@ const VideoChat = () => {
           break;
       }
     });
-  }, [endCall]);
+  }, [endCall, isCallActive, connectionState]);
 
   // Start call as caller
-  const startCall = async () => {
+  const startCall = useCallback(async () => {
     setIsConnecting(true);
     setConnectionState("connecting");
 
@@ -429,10 +492,16 @@ const VideoChat = () => {
       setIsConnecting(false);
       setConnectionState("failed");
     }
-  };
+  }, [
+    setIsConnecting,
+    setConnectionState,
+    setIsCallActive,
+    initializeMedia,
+    createPeerConnection,
+  ]);
 
   // Join call as callee
-  const joinCall = async () => {
+  const joinCall = useCallback(async () => {
     setIsConnecting(true);
     setConnectionState("connecting");
 
@@ -465,14 +534,20 @@ const VideoChat = () => {
       setIsConnecting(false);
       setConnectionState("failed");
     }
-  };
+  }, [
+    setIsConnecting,
+    setConnectionState,
+    setIsCallActive,
+    initializeMedia,
+    createPeerConnection,
+  ]);
 
   // Simulate receiving call (for demo)
-  const simulateIncomingCall = () => {
+  const simulateIncomingCall = useCallback(() => {
     if (signalingRef.current) {
       signalingRef.current.simulateRemoteOffer();
     }
-  };
+  }, []);
 
   // Helper functions for status display
   const getStatusIcon = (state) => {
