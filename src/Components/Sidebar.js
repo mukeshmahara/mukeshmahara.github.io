@@ -1,19 +1,51 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
-const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
-  const handleNavClick = (section, e) => {
-    console.log("Navigation clicked:", section); // Debug log
-    setActiveSection(section);
+const Sidebar = ({ closeMenu }) => {
+  const navigation = [
+    {
+      label: "Intro",
+      path: "/",
+      end: true,
+    },
+    {
+      label: "Projects",
+      path: "/projects",
+    },
+    {
+      label: "Work Experience",
+      path: "/experience",
+    },
+    {
+      label: "Education",
+      path: "/education",
+    },
+    {
+      label: "Skills",
+      path: "/skills",
+    },
+    {
+      label: "Achievements",
+      path: "/achievements",
+    },
+    {
+      label: "Prize Checker",
+      path: "/coupon-checker",
+    },
+    {
+      label: "AI Assistant",
+      path: "/voice-assistant",
+    },
+    {
+      label: "Prize Draws",
+      path: "/draws",
+    },
+  ];
+
+  const handleNavClick = () => {
     if (closeMenu) {
-      console.log("Closing mobile menu"); // Debug log
-      closeMenu(); // Close mobile menu after navigation
+      closeMenu();
     }
-  };
-
-  const handleTouchEnd = (section, e) => {
-    e.preventDefault();
-    console.log("Navigation touched:", section); // Debug log
-    handleNavClick(section, e);
   };
 
   return (
@@ -23,77 +55,26 @@ const Sidebar = ({ activeSection, setActiveSection, closeMenu }) => {
           <div className="m-left">M</div>
           <div className="m-right">M</div>
         </div>
+
         <h3>Mukesh Mahara</h3>
       </div>
 
       <nav className="sidebar-nav">
         <div role="menu">
-          <button
-            type="button"
-            className={`nav-button ${activeSection === "intro" ? "active" : ""}`}
-            onClick={(e) => handleNavClick("intro", e)}
-            onTouchEnd={(e) => handleTouchEnd("intro", e)}
-          >
-            Intro
-          </button>
-          <button
-            type="button"
-            className={`nav-button ${activeSection === "projects" ? "active" : ""}`}
-            onClick={(e) => handleNavClick("projects", e)}
-            onTouchEnd={(e) => handleTouchEnd("projects", e)}
-          >
-            Projects
-          </button>
-          <button
-            type="button"
-            className={`nav-button ${activeSection === "experience" ? "active" : ""}`}
-            onClick={(e) => handleNavClick("experience", e)}
-            onTouchEnd={(e) => handleTouchEnd("experience", e)}
-          >
-            Work Experience
-          </button>
-          <button
-            type="button"
-            className={`nav-button ${activeSection === "education" ? "active" : ""}`}
-            onClick={(e) => handleNavClick("education", e)}
-            onTouchEnd={(e) => handleTouchEnd("education", e)}
-          >
-            Education
-          </button>
-          <button
-            type="button"
-            className={`nav-button ${activeSection === "skills" ? "active" : ""}`}
-            onClick={(e) => handleNavClick("skills", e)}
-            onTouchEnd={(e) => handleTouchEnd("skills", e)}
-          >
-            Skills
-          </button>
-          <button
-            type="button"
-            className={`nav-button ${activeSection === "achievements" ? "active" : ""}`}
-            onClick={(e) => handleNavClick("achievements", e)}
-            onTouchEnd={(e) => handleTouchEnd("achievements", e)}
-          >
-            Achievements
-          </button>
-
-          <button
-            type="button"
-            className={`nav-button ${activeSection === "coupon-checker" ? "active" : ""}`}
-            onClick={(e) => handleNavClick("coupon-checker", e)}
-            onTouchEnd={(e) => handleTouchEnd("coupon-checker", e)}
-          >
-            Prize Checker
-          </button>
-
-          <button
-            type="button"
-            className={`nav-button ${activeSection === "voice-assistant" ? "active" : ""}`}
-            onClick={(e) => handleNavClick("voice-assistant", e)}
-            onTouchEnd={(e) => handleTouchEnd("voice-assistant", e)}
-          >
-            AI Assistant
-          </button>
+          {navigation.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.end}
+              role="menuitem"
+              onClick={handleNavClick}
+              className={({ isActive }) =>
+                `nav-button ${isActive ? "active" : ""}`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
         </div>
       </nav>
 
