@@ -6,91 +6,95 @@ const createSignalingServer = () => {
   const listeners = [];
   let socket = null;
   let isWebSocketConnected = false;
-  
+
   const connectWebSocket = () => {
     return new Promise((resolve) => {
       try {
         // Try to connect to a public WebSocket server
-        socket = new WebSocket('wss://ws.postman-echo.com/raw');
-        
+        socket = new WebSocket("wss://ws.postman-echo.com/raw");
+
         socket.onopen = () => {
-          console.log('✅ Connected to WebSocket server');
+          console.log("✅ Connected to WebSocket server");
           isWebSocketConnected = true;
           resolve(true);
         };
-        
+
         socket.onmessage = (event) => {
           try {
             const message = JSON.parse(event.data);
-            listeners.forEach(callback => callback(message));
+            listeners.forEach((callback) => callback(message));
           } catch (e) {
-            console.log('📥 WebSocket message:', event.data);
+            console.log("📥 WebSocket message:", event.data);
           }
         };
-        
+
         socket.onerror = () => {
-          console.log('⚠️ WebSocket connection failed, using mock mode');
+          console.log("⚠️ WebSocket connection failed, using mock mode");
           isWebSocketConnected = false;
           resolve(false);
         };
-        
+
         socket.onclose = () => {
           isWebSocketConnected = false;
-          console.log('🔴 WebSocket disconnected');
+          console.log("🔴 WebSocket disconnected");
         };
-        
+
         // Timeout after 3 seconds
         setTimeout(() => {
           if (!isWebSocketConnected) {
-            console.log('⏱️ WebSocket timed out, using mock mode');
+            console.log("⏱️ WebSocket timed out, using mock mode");
             resolve(false);
           }
         }, 3000);
       } catch (error) {
-        console.log('❌ WebSocket not available:', error.message);
+        console.log("❌ WebSocket not available:", error.message);
         resolve(false);
       }
     });
   };
-  
+
   return {
     connect: async (roomId) => {
       console.log(`🟡 Connecting to signaling, room: ${roomId}`);
-      
+
       // Try WebSocket first
       const wsConnected = await connectWebSocket();
-      
+
       if (wsConnected && socket) {
-        console.log('✅ Using WebSocket for real peer-to-peer');
-        socket.send(JSON.stringify({
-          type: 'join-room',
-          room: roomId
-        }));
+        console.log("✅ Using WebSocket for real peer-to-peer");
+        socket.send(
+          JSON.stringify({
+            type: "join-room",
+            room: roomId,
+          }),
+        );
       } else {
-        console.log('🟡 Using mock signaling for demo');
+        console.log("🟡 Using mock signaling for demo");
       }
-      
+
       return Promise.resolve();
     },
-    
+
     disconnect: () => {
       if (socket && isWebSocketConnected) {
         socket.close();
       }
       console.log(`🔴 Disconnected from signaling server`);
     },
-    
+
     sendMessage: (message) => {
       console.log("📤 Sending message:", message.type);
-      
+
       // Send via WebSocket if connected
       if (socket && isWebSocketConnected) {
-        socket.send(JSON.stringify({
-          ...message,
-          timestamp: Date.now()
-        }));
-        console.log('✅ Sent via WebSocket');
-      } 
+        socket.send(
+          JSON.stringify({
+            ...message,
+            timestamp: Date.now(),
+          }),
+        );
+        console.log("✅ Sent via WebSocket");
+      }
       // Fallback to mock for demo
       else {
         setTimeout(() => {
@@ -99,45 +103,47 @@ const createSignalingServer = () => {
             const fakeAnswer = {
               type: "answer",
               sdp: "v=0\r\no=- 123456789 2 IN IP4 127.0.0.1\r\n...",
-              from: "remote-peer"
+              from: "remote-peer",
             };
             console.log("📥 Simulating answer from remote peer");
-            listeners.forEach(callback => callback(fakeAnswer));
+            listeners.forEach((callback) => callback(fakeAnswer));
           }
         }, 1000);
       }
     },
-    
+
     onMessage: (callback) => {
       listeners.push(callback);
     },
-    
+
     simulateRemoteOffer: () => {
       if (listeners.length > 0) {
         const fakeOffer = {
           type: "offer",
           sdp: "v=0\r\no=- 987654321 2 IN IP4 127.0.0.1\r\n...",
-          from: "remote-peer"
+          from: "remote-peer",
         };
         console.log("📥 Simulating incoming offer");
-        listeners.forEach(callback => callback(fakeOffer));
+        listeners.forEach((callback) => callback(fakeOffer));
       }
     },
-    
+
     // New method for peer discovery
     sendToPeer: (peerId, data) => {
       if (socket && isWebSocketConnected) {
-        socket.send(JSON.stringify({
-          type: 'peer-message',
-          to: peerId,
-          data: data
-        }));
+        socket.send(
+          JSON.stringify({
+            type: "peer-message",
+            to: peerId,
+            data: data,
+          }),
+        );
       }
     },
-    
+
     getConnectionType: () => {
-      return isWebSocketConnected ? 'websocket' : 'mock';
-    }
+      return isWebSocketConnected ? "websocket" : "mock";
+    },
   };
 };
 
@@ -252,10 +258,13 @@ const VideoChat = () => {
     pc.onconnectionstatechange = () => {
       console.log("🔗 Connection state:", pc.connectionState);
       setConnectionState(pc.connectionState);
-      
+
       if (pc.connectionState === "connected") {
         console.log("✅ WebRTC connection established!");
-      } else if (pc.connectionState === "failed" || pc.connectionState === "disconnected") {
+      } else if (
+        pc.connectionState === "failed" ||
+        pc.connectionState === "disconnected"
+      ) {
         console.log("❌ WebRTC connection failed");
       }
     };
@@ -267,6 +276,42 @@ const VideoChat = () => {
 
     setPeerConnection(pc);
     return pc;
+  };
+
+  // End call
+  const endCall = () => {
+    console.log("📞 Ending call...");
+
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+      setPeerConnection(null);
+    }
+
+    if (localStream) {
+      localStream.getTracks().forEach((track) => track.stop());
+      setLocalStream(null);
+    }
+
+    if (remoteStream) {
+      setRemoteStream(null);
+    }
+
+    if (localVideoRef.current) {
+      localVideoRef.current.srcObject = null;
+    }
+
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+    }
+
+    if (signalingRef.current) {
+      signalingRef.current.sendMessage({ type: "end-call" });
+      signalingRef.current.disconnect();
+    }
+
+    setIsCallActive(false);
+    setConnectionState("disconnected");
   };
 
   // Handle signaling messages
@@ -283,17 +328,17 @@ const VideoChat = () => {
           console.log("📥 Received offer, creating answer...");
           try {
             await peerConnectionRef.current.setRemoteDescription(
-              new RTCSessionDescription(message)
+              new RTCSessionDescription(message),
             );
-            
+
             const answer = await peerConnectionRef.current.createAnswer();
             await peerConnectionRef.current.setLocalDescription(answer);
-            
+
             signalingRef.current.sendMessage({
               type: "answer",
               sdp: answer.sdp,
             });
-            
+
             setConnectionState("connected");
           } catch (error) {
             console.error("Error handling offer:", error);
@@ -304,7 +349,7 @@ const VideoChat = () => {
           console.log("📥 Received answer");
           try {
             await peerConnectionRef.current.setRemoteDescription(
-              new RTCSessionDescription(message)
+              new RTCSessionDescription(message),
             );
             setConnectionState("connected");
           } catch (error) {
@@ -316,7 +361,7 @@ const VideoChat = () => {
           console.log("🧊 Received ICE candidate");
           try {
             await peerConnectionRef.current.addIceCandidate(
-              new RTCIceCandidate(message.candidate)
+              new RTCIceCandidate(message.candidate),
             );
           } catch (error) {
             console.error("Error adding ICE candidate:", error);
@@ -327,9 +372,13 @@ const VideoChat = () => {
           console.log("📞 Received end call");
           endCall();
           break;
+
+        default:
+          console.log("📥 Unknown message type:", message.type);
+          break;
       }
     });
-  }, []);
+  }, [endCall]);
 
   // Start call as caller
   const startCall = async () => {
@@ -374,7 +423,6 @@ const VideoChat = () => {
       setIsCallActive(true);
       setIsConnecting(false);
       setConnectionState("waiting-for-answer");
-
     } catch (error) {
       console.error("Error starting call:", error);
       alert(`Failed to start call: ${error.message}`);
@@ -411,7 +459,6 @@ const VideoChat = () => {
       setIsCallActive(true);
       setIsConnecting(false);
       setConnectionState("waiting-for-offer");
-
     } catch (error) {
       console.error("Error joining call:", error);
       alert(`Failed to join call: ${error.message}`);
@@ -425,42 +472,6 @@ const VideoChat = () => {
     if (signalingRef.current) {
       signalingRef.current.simulateRemoteOffer();
     }
-  };
-
-  // End call
-  const endCall = () => {
-    console.log("📞 Ending call...");
-
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close();
-      peerConnectionRef.current = null;
-      setPeerConnection(null);
-    }
-
-    if (localStream) {
-      localStream.getTracks().forEach((track) => track.stop());
-      setLocalStream(null);
-    }
-
-    if (remoteStream) {
-      setRemoteStream(null);
-    }
-
-    if (localVideoRef.current) {
-      localVideoRef.current.srcObject = null;
-    }
-
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = null;
-    }
-
-    if (signalingRef.current) {
-      signalingRef.current.sendMessage({ type: "end-call" });
-      signalingRef.current.disconnect();
-    }
-
-    setIsCallActive(false);
-    setConnectionState("disconnected");
   };
 
   // Helper functions for status display
@@ -542,9 +553,7 @@ const VideoChat = () => {
           <span className={`status-indicator ${connectionState}`}>
             {getStatusIcon(connectionState)}
           </span>
-          <span className="status-text">
-            {getStatusText(connectionState)}
-          </span>
+          <span className="status-text">{getStatusText(connectionState)}</span>
         </div>
       </div>
 
@@ -601,7 +610,7 @@ const VideoChat = () => {
             >
               {isConnecting ? "🔄 Calling..." : "📞 Call a Friend"}
             </button>
-            
+
             <button
               onClick={joinCall}
               disabled={isConnecting}
@@ -609,7 +618,7 @@ const VideoChat = () => {
             >
               {isConnecting ? "🔄 Joining..." : "📱 Join as Callee"}
             </button>
-            
+
             <button
               onClick={simulateIncomingCall}
               className="nav-button btn-info"
@@ -619,13 +628,10 @@ const VideoChat = () => {
           </div>
         ) : (
           <div className="active-call-controls">
-            <button
-              onClick={endCall}
-              className="nav-button btn-danger"
-            >
+            <button onClick={endCall} className="nav-button btn-danger">
               📞 End Call
             </button>
-            
+
             <button
               onClick={toggleAudio}
               className={`nav-button ${isAudioEnabled ? "btn-success" : "btn-secondary"}`}
@@ -644,8 +650,10 @@ const VideoChat = () => {
 
         <div className="status-indicators">
           <span className="connection-info">
-            WebRTC: <code>{connectionState}</code> | 
-            Signal: <code>{signalingServer?.getConnectionType?.() || 'checking...'}</code>
+            WebRTC: <code>{connectionState}</code> | Signal:{" "}
+            <code>
+              {signalingServer?.getConnectionType?.() || "checking..."}
+            </code>
           </span>
           <span
             className={`status-dot ${isAudioEnabled ? "audio-on" : "audio-off"}`}
@@ -661,18 +669,25 @@ const VideoChat = () => {
 
         <div className="info-box">
           <small>
-            <strong>🎯 How to Call a Friend:</strong><br />
-            1. <strong>Share your portfolio URL</strong> with your friend<br />
-            2. <strong>You click "Call a Friend"</strong> (becomes Caller)<br />
-            3. <strong>Friend clicks "Join as Callee"</strong> (becomes Callee)<br />
-            4. <strong>Grant camera/microphone</strong> permissions on both<br />
-            5. <strong>Wait for connection</strong> (may take 10-15 seconds)<br /><br />
-            
-            <strong>🌐 Connection Types:</strong><br />
-            • <code>WebSocket</code>: Real peer-to-peer (try HTTPS)<br />
-            • <code>Mock</code>: Demo mode (works anywhere)<br />
-            • <code>Local Network</code>: Fastest (same WiFi)<br /><br />
-            
+            <strong>🎯 How to Call a Friend:</strong>
+            <br />
+            1. <strong>Share your portfolio URL</strong> with your friend
+            <br />
+            2. <strong>You click "Call a Friend"</strong> (becomes Caller)
+            <br />
+            3. <strong>Friend clicks "Join as Callee"</strong> (becomes Callee)
+            <br />
+            4. <strong>Grant camera/microphone</strong> permissions on both
+            <br />
+            5. <strong>Wait for connection</strong> (may take 10-15 seconds)
+            <br />
+            <br />
+            <strong>🌐 Connection Types:</strong>
+            <br />• <code>WebSocket</code>: Real peer-to-peer (try HTTPS)
+            <br />• <code>Mock</code>: Demo mode (works anywhere)
+            <br />• <code>Local Network</code>: Fastest (same WiFi)
+            <br />
+            <br />
             <em>Tip: For best results, both use Chrome on HTTPS.</em>
           </small>
         </div>
