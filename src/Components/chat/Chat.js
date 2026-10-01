@@ -462,7 +462,7 @@ const VideoChat = () => {
           break;
       }
     });
-  }, [endCall, isCallActive, connectionState]);
+  }, [endCall, isCallActive, connectionState, createPeerConnection]);
 
   // Start call as caller
   const startCall = useCallback(async () => {
