@@ -338,12 +338,6 @@ const VideoChat = () => {
 
       if (!peerConnectionRef.current) return;
 
-      // Check if we're already in a call
-      if (!isCallActive && message.type !== "end-call") {
-        console.log("⚠️ Ignoring signaling message - call not active");
-        return;
-      }
-
       switch (message.type) {
         case "offer":
           console.log("📥 Received offer, creating answer...");
