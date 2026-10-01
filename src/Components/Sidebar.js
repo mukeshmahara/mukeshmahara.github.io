@@ -40,6 +40,10 @@ const Sidebar = ({ closeMenu }) => {
       label: "Prize Draws",
       path: "/draws",
     },
+    {
+      label: "Chat",
+      path: "/chat",
+    },
   ];
 
   const handleNavClick = () => {
