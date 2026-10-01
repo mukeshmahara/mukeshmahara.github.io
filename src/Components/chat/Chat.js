@@ -348,23 +348,43 @@ const VideoChat = () => {
         case "offer":
           console.log("📥 Received offer, creating answer...");
           try {
+            // Ensure the connection is created if not yet
+            if (!peerConnectionRef.current) {
+              createPeerConnection(); // Initialize if needed
+            }
+
+            const pc = peerConnectionRef.current;
+            if (!pc) {
+              console.error("Peer connection is not available");
+              return;
+            }
+
             // Check current signaling state
-            const currentState = peerConnectionRef.current.signalingState;
+            const currentState = pc.signalingState;
             if (
               currentState !== "stable" &&
-              currentState !== "have-local-offer"
+              currentState !== "have-remote-offer"
             ) {
               console.log(`⚠️ Skipping offer - wrong state: ${currentState}`);
               break;
             }
 
-            await peerConnectionRef.current.setRemoteDescription(
-              new RTCSessionDescription(message),
-            );
+            await pc.setRemoteDescription(new RTCSessionDescription(message));
 
-            // Create and set local answer
-            const answer = await peerConnectionRef.current.createAnswer();
-            await peerConnectionRef.current.setLocalDescription(answer);
+            const answer = await pc.createAnswer();
+            try {
+              await pc.setLocalDescription(answer);
+            } catch (localError) {
+              console.error("Error setting local description:", localError);
+              // Handle recovery if setLocalDescription fails
+              if (localError.name === "InvalidStateError") {
+                console.log(
+                  "🔄 Invalid state for answer, attempting to recover...",
+                );
+                await pc.restartIce(); // Restart ICE and attempt to set again
+                await pc.setLocalDescription(answer);
+              }
+            }
 
             // Send answer back
             signalingRef.current.sendMessage({
@@ -376,10 +396,11 @@ const VideoChat = () => {
             setConnectionState("connected");
           } catch (error) {
             console.error("Error handling offer:", error);
-            // If we fail to handle offer, end the call
             if (error.name === "InvalidStateError") {
-              console.log("🔄 Invalid state, attempting to recover...");
-              endCall();
+              console.log(
+                "🔄 Invalid state for offer, attempting to recover...",
+              );
+              endCall(); // Terminate or retry as needed
             }
           }
           break;
