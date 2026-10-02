@@ -972,10 +972,17 @@ export const useWebRTC = ({
   // --------------------------------------------------
 
   useEffect(() => {
+    const localVideoElement = localVideoRef.current;
+    const remoteVideoElement = remoteVideoRef.current;
+
     return () => {
       console.log("🧹 useWebRTC component cleanup");
 
       isCallEndingRef.current = true;
+
+      // --------------------------------------------
+      // Close WebRTC connection
+      // --------------------------------------------
 
       const peerConnection = peerConnectionRef.current;
 
@@ -993,6 +1000,10 @@ export const useWebRTC = ({
         peerConnectionRef.current = null;
       }
 
+      // --------------------------------------------
+      // Stop local media
+      // --------------------------------------------
+
       const stream = localStreamRef.current;
 
       if (stream) {
@@ -1003,25 +1014,34 @@ export const useWebRTC = ({
 
       localStreamRef.current = null;
 
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = null;
+      // --------------------------------------------
+      // Clear video elements
+      // --------------------------------------------
+
+      if (localVideoElement) {
+        localVideoElement.srcObject = null;
       }
 
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = null;
+      if (remoteVideoElement) {
+        remoteVideoElement.srcObject = null;
       }
+
+      // --------------------------------------------
+      // Disconnect signaling
+      // --------------------------------------------
 
       signalingRef.current?.disconnect();
-
       signalingRef.current = null;
 
-      pendingIceCandidatesRef.current = [];
+      // --------------------------------------------
+      // Reset refs
+      // --------------------------------------------
 
+      pendingIceCandidatesRef.current = [];
       offerCreatedRef.current = false;
       isCallerRef.current = false;
     };
   }, [localVideoRef, remoteVideoRef]);
-
   // --------------------------------------------------
   // Return API
   // --------------------------------------------------
