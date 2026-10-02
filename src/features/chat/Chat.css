@@ -250,7 +250,7 @@
   font-family: monospace;
   background: rgba(20, 30, 48, 0.7);
   padding: 10px;
-  border-radius:5px;
+  border-radius: 5px;
   margin-top: 10px;
   max-height: 100px;
   overflow-y: auto;
@@ -439,7 +439,9 @@
 }
 
 @keyframes dotPulse {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     opacity: 0.2;
   }
   30% {
@@ -505,28 +507,28 @@
   .video-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .remote-video,
   .local-video {
     height: 250px;
   }
-  
+
   .chat-tabs {
     flex-direction: column;
   }
-  
+
   .control-buttons {
     flex-wrap: wrap;
   }
-  
+
   .messages-container {
     height: 250px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .action-buttons .nav-button {
     width: 100%;
   }
@@ -559,17 +561,17 @@
   .chat-header h2 {
     font-size: 1.8rem;
   }
-  
+
   .video-controls .nav-button {
     min-width: 80px;
     padding: 8px 12px;
     font-size: 0.8rem;
   }
-  
+
   .message-input {
     flex-direction: column;
   }
-  
+
   .send-button {
     width: 100%;
   }

@@ -15,8 +15,7 @@ import ChatBot from "./Components/ChatBot";
 import VoiceAssistantFeature from "./features/voice-assistant";
 import CouponCheckerComponent from "./Components/CouponCheckerComponent";
 import DrawsPage from "./Components/ird/DrawsPage";
-import Chat from "./Components/chat/Chat";
-
+import Chat from "../src/features/chat/Chat";
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
 
