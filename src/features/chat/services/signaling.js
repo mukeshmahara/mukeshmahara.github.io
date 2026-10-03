@@ -91,6 +91,24 @@ export const createSignalingServer = () => {
         });
       });
 
+      socket.on("ringing", (data) => {
+        console.log("📞 Incoming call from:", data.from);
+
+        notify({
+          type: "ringing",
+          ...data,
+        });
+      });
+
+      socket.on("call-rejected", (data) => {
+        console.log("⛔ Call rejected by:", data.from);
+
+        notify({
+          type: "call-rejected",
+          ...data,
+        });
+      });
+
       socket.on("disconnect", (reason) => {
         console.log("🔴 Socket.IO disconnected:", reason);
 
@@ -140,6 +158,21 @@ export const createSignalingServer = () => {
           socket.emit("ice-candidate", {
             roomId: currentRoomId,
             candidate: message.candidate,
+          });
+          break;
+
+        case "ringing":
+          socket.emit("ringing", {
+            roomId: currentRoomId,
+            from: message.from,
+            timestamp: message.timestamp,
+          });
+          break;
+
+        case "call-rejected":
+          socket.emit("call-rejected", {
+            roomId: currentRoomId,
+            from: message.from,
           });
           break;
 

@@ -30,6 +30,8 @@ export const useWebRTC = ({
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionState, setConnectionState] = useState("disconnected");
+  const [isRinging, setIsRinging] = useState(false);
+  const [incomingCall, setIncomingCall] = useState(null);
 
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
@@ -58,6 +60,9 @@ export const useWebRTC = ({
 
   // Prevent handling signaling after cleanup.
   const isCallEndingRef = useRef(false);
+
+  // Ringing timeout ref
+  const ringingTimeoutRef = useRef(null);
 
   // --------------------------------------------------
   // Create signaling server
@@ -410,6 +415,54 @@ export const useWebRTC = ({
   }, [cleanupPeerConnection]);
 
   // --------------------------------------------------
+  // Accept incoming call (as callee)
+  // --------------------------------------------------
+
+  const acceptCall = useCallback(async () => {
+    console.log("✅ Accepting incoming call");
+
+    // Clear any existing ringing timeout
+    if (ringingTimeoutRef.current) {
+      clearTimeout(ringingTimeoutRef.current);
+      ringingTimeoutRef.current = null;
+    }
+
+    setIsRinging(false);
+    setIncomingCall(null);
+    setConnectionState("connecting");
+
+    console.log("📞 Call accepted - proceeding with WebRTC connection");
+  }, []);
+
+  // --------------------------------------------------
+  // Reject incoming call (as callee)
+  // --------------------------------------------------
+
+  const rejectCall = useCallback(() => {
+    console.log("⛔ Rejecting incoming call");
+
+    // Clear any existing ringing timeout
+    if (ringingTimeoutRef.current) {
+      clearTimeout(ringingTimeoutRef.current);
+      ringingTimeoutRef.current = null;
+    }
+
+    // Send rejection message to caller
+    if (signalingRef.current) {
+      signalingRef.current.sendMessage({
+        type: "call-rejected",
+        from: signalingRef.current?.getSocketId?.() || "callee",
+      });
+    }
+
+    setIsRinging(false);
+    setIncomingCall(null);
+    setConnectionState("disconnected");
+
+    console.log("📞 Call rejected");
+  }, []);
+
+  // --------------------------------------------------
   // Create and send offer
   // --------------------------------------------------
 
@@ -471,6 +524,14 @@ export const useWebRTC = ({
 
         return;
       }
+
+      // Send ringing notification before sending the offer
+      // This lets the callee know someone is calling before processing the offer
+      signalingRef.current?.sendMessage({
+        type: "ringing",
+        from: signalingRef.current?.getSocketId?.() || "caller",
+        timestamp: Date.now(),
+      });
 
       signalingRef.current?.sendMessage({
         type: "offer",
@@ -734,6 +795,52 @@ export const useWebRTC = ({
             console.error("❌ Signaling connection error:", message.error);
 
             setConnectionState("failed");
+
+            break;
+          }
+
+          // --------------------------------------------
+          // Incoming call (ringing)
+          // --------------------------------------------
+
+          case "ringing": {
+            if (isCallActive || isCallEndingRef.current) {
+              console.log("⚠️ Ignoring incoming call - already in call");
+              return;
+            }
+
+            console.log("📞 Incoming call from:", message.from);
+
+            setIncomingCall({
+              from: message.from,
+              timestamp: message.timestamp,
+            });
+            setIsRinging(true);
+            setConnectionState("ringing");
+
+            // Auto-reject after 30 seconds
+            ringingTimeoutRef.current = setTimeout(() => {
+              if (isRinging) {
+                console.log("⏰ Ringing timeout - auto rejecting");
+                rejectCall();
+              }
+            }, 30000);
+
+            break;
+          }
+
+          // --------------------------------------------
+          // Call rejected
+          // --------------------------------------------
+
+          case "call-rejected": {
+            console.log("⛔ Call was rejected");
+
+            if (isCallerRef.current && !isCallActive) {
+              console.log("📞 Call rejected by callee");
+              alert("Call was rejected or timed out");
+              endCall();
+            }
 
             break;
           }
@@ -1052,6 +1159,8 @@ export const useWebRTC = ({
     isVideoEnabled,
     isConnecting,
     connectionState,
+    isRinging,
+    incomingCall,
 
     localStream,
     remoteStream,
@@ -1061,6 +1170,8 @@ export const useWebRTC = ({
     startCall,
     joinCall,
     endCall,
+    acceptCall,
+    rejectCall,
 
     toggleAudio,
     toggleVideo,

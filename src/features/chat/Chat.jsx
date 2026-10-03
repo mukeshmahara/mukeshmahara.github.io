@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import "./Chat.css";
-import VideoChat from "./components/VideoChat";
+import VideoChat from "./components/videoChat/VideoChat";
 import ChatInterface from "./components/ChatInterface";
-import QuickActions from "./components/QuickActions";
 
 const Chat = () => {
   const [activeTab, setActiveTab] = useState("chat");
@@ -42,8 +41,6 @@ const Chat = () => {
             <ChatInterface />
           </div>
         )}
-
-        <QuickActions />
       </div>
     </div>
   );

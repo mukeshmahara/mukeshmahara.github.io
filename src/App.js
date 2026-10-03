@@ -12,7 +12,6 @@ import Skills from "./Components/Skills";
 import Achievements from "./Components/Achievements";
 import Sidebar from "./Components/Sidebar";
 import ChatBot from "./Components/ChatBot";
-import VoiceAssistantFeature from "./features/voice-assistant";
 import CouponCheckerComponent from "./Components/CouponCheckerComponent";
 import DrawsPage from "./Components/ird/DrawsPage";
 import Chat from "../src/features/chat/Chat";
@@ -96,8 +95,6 @@ function App() {
           </Routes>
 
           <ChatBot />
-
-          <VoiceAssistantFeature />
         </main>
       </div>
     </div>
