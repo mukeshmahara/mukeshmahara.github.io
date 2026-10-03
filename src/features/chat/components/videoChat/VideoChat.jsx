@@ -8,7 +8,6 @@ import {
   MicOff,
   User,
   Wifi,
-  WifiOff,
   Loader2,
   Circle,
   HelpCircle,
@@ -132,6 +131,15 @@ const VideoChat = () => {
       setShowControls(true);
     }
   }, [isFullscreen, isCallActive]);
+
+  // Reset UI state when call ends
+  useEffect(() => {
+    if (!isCallActive) {
+      // Reset local UI state
+      setIsFullscreen(false);
+      setShowControls(true);
+    }
+  }, [isCallActive]);
 
   const status = STATUS[connectionState] ?? {
     icon: <Circle className="w-2 h-2 fill-slate-500 text-slate-500" />,
