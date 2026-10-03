@@ -858,7 +858,15 @@ export const useWebRTC = ({
         setConnectionState("failed");
       }
     },
-    [cleanupPeerConnection, createAndSendOffer, flushPendingIceCandidates],
+    [
+      cleanupPeerConnection,
+      createAndSendOffer,
+      flushPendingIceCandidates,
+      isCallActive,
+      endCall,
+      isRinging,
+      rejectCall,
+    ],
   );
 
   // --------------------------------------------------
