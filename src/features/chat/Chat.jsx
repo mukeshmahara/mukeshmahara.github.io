@@ -4,37 +4,39 @@ import VideoChat from "./components/videoChat/VideoChat";
 import ChatInterface from "./components/ChatInterface";
 
 const Chat = () => {
-  const [activeTab, setActiveTab] = useState("chat");
+  const [isVideoCallActive, setIsVideoCallActive] = useState(false);
+
+  const handleStartVideoCall = () => {
+    setIsVideoCallActive(true);
+  };
+
+  const handleEndVideoCall = () => {
+    setIsVideoCallActive(false);
+  };
 
   return (
     <div className="content-section">
       <div className="chat-header">
         <h2>Video Chat & Messaging</h2>
-        <p className="chat-subtitle">
-          Connect with others via video call or text chat
-        </p>
-      </div>
 
-      <div className="chat-tabs">
-        <button
-          onClick={() => setActiveTab("video")}
-          className={`nav-button ${activeTab === "video" ? "active" : ""}`}
-        >
-          📹 Video Call
-        </button>
-
-        <button
-          onClick={() => setActiveTab("chat")}
-          className={`nav-button ${activeTab === "chat" ? "active" : ""}`}
-        >
-          💬 Text Chat
-        </button>
+        {!isVideoCallActive ? (
+          <button
+            onClick={handleStartVideoCall}
+            className="video-call-header-btn"
+          >
+            📹 Video Call
+          </button>
+        ) : (
+          <button onClick={handleEndVideoCall} className="end-call-header-btn">
+            📞 End Call
+          </button>
+        )}
       </div>
 
       <div className="chat-content">
-        {activeTab === "video" ? (
+        {isVideoCallActive ? (
           <div className="video-chat-section">
-            <VideoChat />
+            <VideoChat onCallEnd={handleEndVideoCall} />
           </div>
         ) : (
           <div className="text-chat-section">

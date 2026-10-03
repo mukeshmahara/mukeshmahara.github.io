@@ -45,7 +45,6 @@ const ChatInterface = () => {
         <h3>💬 Text Chat</h3>
         <span className="chat-status">Online</span>
       </div>
-
       <div className="messages-container">
         {messages.length === 0 ? (
           <div className="no-messages">
@@ -77,24 +76,83 @@ const ChatInterface = () => {
           </div>
         )}
       </div>
-
-      <div className="message-input">
+      <div className="flex items-center gap-2 w-full p-2 rounded-2xl bg-slate-900/80 border border-slate-700/50 shadow-lg backdrop-blur-sm">
         <input
           type="text"
           value={newMessage}
           onChange={(event) => setNewMessage(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === "Enter") sendMessage();
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              if (newMessage.trim()) {
+                sendMessage();
+              }
+            }
           }}
           placeholder="Type a message..."
-          className="chat-input"
+          aria-label="Message"
+          className="
+      flex-1
+      min-w-0
+      h-12
+      px-4
+      text-sm sm:text-base
+      text-slate-100
+      placeholder:text-slate-500
+      bg-transparent
+      border-0
+      outline-none
+      focus:ring-0
+    "
         />
 
         <button
+          type="button"
           onClick={sendMessage}
-          className="nav-button btn-primary send-button"
+          disabled={!newMessage.trim()}
+          aria-label="Send message"
+          title="Send message"
+          className="
+      shrink-0
+      w-12
+      h-12
+      rounded-xl
+      flex
+      items-center
+      justify-center
+      bg-blue-600
+      text-white
+      shadow-md
+      transition-all
+      duration-200
+      hover:bg-blue-500
+      hover:scale-105
+      active:scale-95
+      disabled:bg-slate-700
+      disabled:text-slate-500
+      disabled:cursor-not-allowed
+      disabled:hover:scale-100
+    "
         >
-          Send
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M22 2L11 13"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M22 2L15 22L11 13L2 9L22 2Z"
+            />
+          </svg>
         </button>
       </div>
     </div>

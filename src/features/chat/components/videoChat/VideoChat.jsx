@@ -61,7 +61,7 @@ const STATUS = {
   },
 };
 
-const VideoChat = () => {
+const VideoChat = ({ onCallEnd }) => {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
 
