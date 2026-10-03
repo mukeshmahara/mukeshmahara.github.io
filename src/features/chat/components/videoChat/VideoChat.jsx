@@ -73,7 +73,6 @@ const VideoChat = () => {
     connectionState,
     isRinging,
     incomingCall,
-    localStream,
     remoteStream,
     signalingServer,
     startCall,
