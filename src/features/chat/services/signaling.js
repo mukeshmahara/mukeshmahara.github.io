@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 const SIGNALING_SERVER_URL =
-  import.meta.env.VITE_SIGNALING_SERVER_URL ||
+  process.env.REACT_APP_SIGNALING_SERVER_URL ||
   "https://signaling.mukeshmahara.com.np/";
 
 export const createSignalingServer = () => {
@@ -109,6 +109,13 @@ export const createSignalingServer = () => {
         });
       });
 
+      socket.on("chat-message", (data) => {
+        notify({
+          ...data,
+          type: "chat-message",
+        });
+      });
+
       socket.on("disconnect", (reason) => {
         console.log("🔴 Socket.IO disconnected:", reason);
 
@@ -131,12 +138,12 @@ export const createSignalingServer = () => {
     sendMessage(message) {
       if (!socket?.connected) {
         console.warn("⚠️ Socket.IO is not connected");
-        return;
+        return false;
       }
 
       if (!currentRoomId) {
         console.warn("⚠️ No active room");
-        return;
+        return false;
       }
 
       switch (message.type) {
@@ -176,9 +183,41 @@ export const createSignalingServer = () => {
           });
           break;
 
+        case "chat-message":
+          return new Promise((resolve) => {
+            socket.timeout(10_000).emit(
+              "chat-message",
+              {
+                roomId: currentRoomId,
+                message: message.message,
+              },
+              (error, response) => {
+                if (error) {
+                  resolve({
+                    ok: false,
+                    error: "The server did not acknowledge the message.",
+                  });
+                  return;
+                }
+
+                resolve(
+                  response?.ok
+                    ? { ok: true }
+                    : {
+                        ok: false,
+                        error: response?.error || "The server rejected the message.",
+                      },
+                );
+              },
+            );
+          });
+
         default:
           console.warn("⚠️ Unknown signaling message:", message.type);
+          return false;
       }
+
+      return true;
     },
 
     onMessage(callback) {
