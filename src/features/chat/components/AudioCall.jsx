@@ -7,6 +7,7 @@ import {
   PhoneOff,
   Volume2,
 } from "lucide-react";
+import useCallRingtone from "../hooks/useCallRingtone";
 
 const ICE_SERVERS = [{ urls: "stun:stun.l.google.com:19302" }];
 
@@ -19,6 +20,7 @@ const AudioCall = ({ roomId, signaling, isConnected }) => {
   const [remoteVolume, setRemoteVolume] = useState(1);
   const [callDuration, setCallDuration] = useState(0);
   const [error, setError] = useState("");
+  useCallRingtone(Boolean(incomingCall));
 
   const peerConnectionRef = useRef(null);
   const localStreamRef = useRef(null);
@@ -341,38 +343,42 @@ const AudioCall = ({ roomId, signaling, isConnected }) => {
   return (
     <section className="relative flex shrink-0 items-center" aria-label="Audio call">
       {incomingCall ? (
-        <div className="absolute right-0 top-[calc(100%+10px)] z-30 flex w-[min(340px,calc(100vw-32px))] flex-col gap-3 rounded-2xl border border-sky-300/20 bg-slate-950 p-4 text-slate-100 shadow-2xl shadow-black/40 sm:left-auto sm:right-0 sm:top-1/2 sm:w-[min(360px,calc(100vw-32px))] sm:-translate-y-1/2" role="alert">
-          <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-emerald-700 text-white" aria-hidden="true">
-              <PhoneCall size={19} />
+        <div
+          className="fixed inset-0 z-[1200] flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Incoming audio call"
+        >
+          <div className="w-full max-w-sm rounded-2xl border border-slate-700 bg-slate-900 p-6 text-center text-slate-100 shadow-2xl sm:p-8">
+            <span className="relative mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-emerald-900/70 text-emerald-300 ring-1 ring-emerald-300/25">
+              <span className="absolute inset-0 rounded-full border border-emerald-300/70 motion-safe:animate-ping" aria-hidden="true" />
+              <PhoneCall size={30} className="motion-safe:animate-pulse" aria-hidden="true" />
             </span>
-            <div className="grid gap-1">
-              <strong className="text-sm font-semibold">Incoming audio call</strong>
-              <span className="text-xs text-slate-400">Your room partner is calling</span>
+            <h2 className="mb-2 text-xl font-semibold">Incoming audio call</h2>
+            <p className="mb-7 text-sm text-slate-400">
+              Your room partner is inviting you to join.
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                type="button"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-rose-700 px-5 py-3 font-medium text-white transition hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                onClick={rejectCall}
+                aria-label="Reject audio call"
+              >
+                <PhoneOff size={17} aria-hidden="true" />
+                Reject
+              </button>
+              <button
+                type="button"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 font-medium text-white transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-50"
+                onClick={acceptCall}
+                disabled={!isConnected}
+                aria-label="Answer audio call"
+              >
+                <Phone size={17} aria-hidden="true" />
+                Answer
+              </button>
             </div>
-          </div>
-          <div className="flex flex-wrap justify-end gap-2">
-            <button
-              type="button"
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-emerald-700 px-3 text-sm font-semibold text-white transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:opacity-50"
-              onClick={acceptCall}
-              disabled={!isConnected}
-              aria-label="Answer audio call"
-              title="Answer"
-            >
-              <Phone size={18} aria-hidden="true" />
-              <span>Answer</span>
-            </button>
-            <button
-              type="button"
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-rose-700 px-3 text-sm font-semibold text-white transition hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-300"
-              onClick={rejectCall}
-              aria-label="Decline audio call"
-              title="Decline"
-            >
-              <PhoneOff size={18} aria-hidden="true" />
-              <span>Decline</span>
-            </button>
           </div>
         </div>
       ) : isCallActive ? (
