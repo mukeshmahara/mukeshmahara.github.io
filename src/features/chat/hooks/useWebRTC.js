@@ -838,7 +838,6 @@ export const useWebRTC = ({
 
             if (isCallerRef.current && !isCallActive) {
               console.log("📞 Call rejected by callee");
-              alert("Call was rejected or timed out");
               endCall();
             }
 
