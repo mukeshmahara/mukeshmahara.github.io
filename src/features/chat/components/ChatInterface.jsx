@@ -1,8 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { LogOut, Mic, Video, X } from "lucide-react";
+import {
+  LogOut,
+  Mic,
+  PhoneCall,
+  PhoneOff,
+  Send,
+  Video,
+  X,
+} from "lucide-react";
 import AudioCall from "./AudioCall";
 import VideoChat from "./videoChat/VideoChat";
 import { createSignalingServer } from "../services/signaling";
+import useCallRingtone from "../hooks/useCallRingtone";
 
 const STORAGE_KEY_PREFIX = "one-to-one-chat:";
 const MAX_VOICE_DURATION_SECONDS = 20;
@@ -91,6 +100,8 @@ const ChatInterface = () => {
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
 
+  useCallRingtone(videoCallNotification);
+
   const signalingRef = useRef(null);
   const messagesRef = useRef([]);
   const messagesContainerRef = useRef(null);
@@ -100,7 +111,6 @@ const ChatInterface = () => {
   const recordingIntervalRef = useRef(null);
   const recordingTimeoutRef = useRef(null);
   const discardRecordingRef = useRef(false);
-  const videoCallNotificationTimeoutRef = useRef(null);
 
   useEffect(() => {
     const messagesContainer = messagesContainerRef.current;
@@ -113,7 +123,6 @@ const ChatInterface = () => {
     () => () => {
       window.clearInterval(recordingIntervalRef.current);
       window.clearTimeout(recordingTimeoutRef.current);
-      window.clearTimeout(videoCallNotificationTimeoutRef.current);
       if (mediaRecorderRef.current?.state === "recording") {
         mediaRecorderRef.current.stop();
       }
@@ -169,14 +178,18 @@ const ChatInterface = () => {
           event.from !== signaling.getSocketId()
         ) {
           setVideoCallNotification(true);
-          window.clearTimeout(videoCallNotificationTimeoutRef.current);
-          videoCallNotificationTimeoutRef.current = window.setTimeout(
-            () => setVideoCallNotification(false),
-            10_000,
-          );
-          setVideoCallMode("receiver");
-          setIsVideoCallOpen(true);
         }
+        return;
+      }
+
+      if (
+        event.type === "call-rejected" &&
+        event.from !== signaling.getSocketId()
+      ) {
+        setIsVideoCallOpen(false);
+        setVideoCallMode(null);
+        setVideoCallNotification(false);
+        setError("Your video call was declined.");
         return;
       }
 
@@ -295,7 +308,6 @@ const ChatInterface = () => {
     setIsVideoCallOpen(false);
     setVideoCallMode(null);
     setVideoCallNotification(false);
-    window.clearTimeout(videoCallNotificationTimeoutRef.current);
     setActiveRoomId("");
     setMessages([]);
     messagesRef.current = [];
@@ -323,9 +335,32 @@ const ChatInterface = () => {
     setIsVideoCallOpen(true);
   };
 
-  const dismissVideoCallNotification = () => {
+  const answerVideoCall = () => {
+    setError("");
     setVideoCallNotification(false);
-    window.clearTimeout(videoCallNotificationTimeoutRef.current);
+    setVideoCallMode("receiver");
+    setIsVideoCallOpen(true);
+  };
+
+  const rejectVideoCall = () => {
+    const signaling = signalingRef.current;
+    if (
+      !signaling?.sendMessage({
+        type: "call-rejected",
+        from: signaling.getSocketId() || "callee",
+      })
+    ) {
+      setError("Could not reject the video call. Please try again.");
+      return;
+    }
+
+    setVideoCallNotification(false);
+  };
+
+  const closeVideoCall = () => {
+    setIsVideoCallOpen(false);
+    setVideoCallMode(null);
+    setVideoCallNotification(false);
   };
 
   const sendMessage = async (event) => {
@@ -544,34 +579,40 @@ const ChatInterface = () => {
       </header>
 
       {activeRoomId && videoCallNotification && (
-        <div className="fixed right-3 top-3 z-[1200] flex w-[min(440px,calc(100vw-24px))] items-center gap-2.5 rounded-xl border border-sky-300/25 bg-slate-950/95 p-3 text-slate-100 shadow-2xl shadow-black/40 sm:right-5 sm:top-5 sm:gap-3 sm:p-4" role="status" aria-live="assertive">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sky-800 text-sky-100 sm:h-11 sm:w-11" aria-hidden="true">
-            <Video size={20} />
-          </span>
-          <span className="grid min-w-0 flex-1 gap-1">
-            <strong className="text-sm font-semibold">Incoming video call</strong>
-            <span className="truncate text-xs text-slate-400">Your room partner is calling</span>
-          </span>
-          <button
-            type="button"
-            className="min-h-9 shrink-0 rounded-lg bg-sky-700 px-2.5 text-xs font-semibold text-white transition hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-300 sm:px-3 sm:text-sm"
-            onClick={() => {
-              setVideoCallMode("receiver");
-              setIsVideoCallOpen(true);
-              dismissVideoCallNotification();
-            }}
-          >
-            Open call
-          </button>
-          <button
-            type="button"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-slate-500/20 bg-slate-800 text-slate-300 transition hover:bg-rose-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-slate-300/60"
-            onClick={dismissVideoCallNotification}
-            aria-label="Dismiss incoming video call notification"
-            title="Dismiss notification"
-          >
-            <X size={16} aria-hidden="true" />
-          </button>
+        <div
+          className="fixed inset-0 z-[1200] flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Incoming video call"
+        >
+          <div className="w-full max-w-sm rounded-2xl border border-slate-700 bg-slate-900 p-6 text-center text-slate-100 shadow-2xl sm:p-8">
+            <span className="relative mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-sky-900/70 text-sky-300 ring-1 ring-sky-300/25">
+              <span className="absolute inset-0 rounded-full border border-sky-300/70 motion-safe:animate-ping" aria-hidden="true" />
+              <Video size={30} className="motion-safe:animate-pulse" aria-hidden="true" />
+            </span>
+            <h2 className="mb-2 text-xl font-semibold">Incoming video call</h2>
+            <p className="mb-7 text-sm text-slate-400">
+              Your room partner is inviting you to join.
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={rejectVideoCall}
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-rose-700 px-5 py-3 font-medium text-white transition hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              >
+                <PhoneOff size={17} aria-hidden="true" />
+                Reject
+              </button>
+              <button
+                type="button"
+                onClick={answerVideoCall}
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 font-medium text-white transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              >
+                <PhoneCall size={17} aria-hidden="true" />
+                Answer
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -586,7 +627,7 @@ const ChatInterface = () => {
             <button
               type="button"
               className="sticky top-2 z-[60] float-right mr-2 -mb-12 mt-2 grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-slate-950/90 text-slate-100 shadow-lg transition hover:bg-rose-800 focus:outline-none focus:ring-2 focus:ring-white/60"
-              onClick={() => setIsVideoCallOpen(false)}
+              onClick={closeVideoCall}
               aria-label="Close video call"
               title="Close video call"
             >
@@ -595,11 +636,7 @@ const ChatInterface = () => {
             <VideoChat
               roomId={activeRoomId}
               autoCallMode={videoCallMode}
-              onCallEnd={() => {
-                setIsVideoCallOpen(false);
-                setVideoCallMode(null);
-                setVideoCallNotification(false);
-              }}
+              onCallEnd={closeVideoCall}
             />
           </div>
         </div>
@@ -735,7 +772,8 @@ const ChatInterface = () => {
               aria-label="Send message"
               title="Send message"
             >
-              Send
+              <Send size={18} className="sm:hidden" aria-hidden="true" />
+              <span className="hidden sm:inline">Send</span>
             </button>
             {!isRecordingVoice ? (
               <button
