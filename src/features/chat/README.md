@@ -14,6 +14,19 @@ The Socket.IO server must relay the payload and acknowledge it. Restart the serv
 after updating its `chat-message` handler. The client only displays a sent voice
 message after the server acknowledges it.
 
+Audio calls use WebRTC for live audio and the `audio-call` Socket.IO event for
+offer, answer, ICE candidate, and hang-up signaling. Both participants must stay
+in the same chat room. Microphone access and a secure context (HTTPS or localhost)
+are required. For connections across restrictive NATs/firewalls, configure a TURN
+server in `components/AudioCall.jsx`; the default STUN server alone may not connect
+every network.
+
+Video calls are started from the video icon in the room header. The caller sends a
+room-scoped `video-call-request`; the other participant's chat client opens the
+video interface and automatically joins the call. They can accept or reject the
+incoming call, and both participants must grant camera/microphone access. The
+existing WebRTC video UI and media controls use the room ID entered for chat.
+
 Messages (sent and received) are stored in browser local storage under a key scoped
 to the room ID, so history is available again on that browser. This is local
 browser storage, not server-side history or encrypted storage.
@@ -26,6 +39,7 @@ the room is intended to be private and strictly one-to-one.
 
 - `Chat.jsx`: selects between text chat and video call.
 - `components/ChatInterface.jsx`: room join, Socket.IO messaging, and local history.
+- `components/AudioCall.jsx`: room-scoped WebRTC audio calls.
 - `components/videoChat/VideoChat.jsx`: video-call interface.
 - `hooks/useWebRTC.js`: camera/microphone, peer connection, and call lifecycle.
 - `services/signaling.js`: Socket.IO transport shared by chat and video signaling.
