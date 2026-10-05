@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import "./App.css";
 
@@ -17,6 +17,7 @@ import DrawsPage from "./Components/ird/DrawsPage";
 import Chat from "../src/features/chat/Chat";
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -94,7 +95,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
 
-          <ChatBot />
+          {location.pathname !== "/chat" && <ChatBot />}
         </main>
       </div>
     </div>
