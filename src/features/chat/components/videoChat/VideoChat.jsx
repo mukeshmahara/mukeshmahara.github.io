@@ -36,6 +36,7 @@ const VideoChat = ({
     isAudioEnabled,
     isVideoEnabled,
     connectionState,
+    connectionError,
     isRinging,
     incomingCall,
     remoteStream,
@@ -164,6 +165,15 @@ const VideoChat = ({
           {isRinging ? "Incoming call" : status.text}
         </span>
       </div>
+
+      {connectionError && !isFullscreen && (
+        <p
+          className="mb-3 rounded-xl border border-rose-400/25 bg-rose-950/50 px-4 py-3 text-sm text-rose-200"
+          role="alert"
+        >
+          {connectionError}
+        </p>
+      )}
 
       {/* Incoming Call Modal */}
       {isRinging && incomingCall && (

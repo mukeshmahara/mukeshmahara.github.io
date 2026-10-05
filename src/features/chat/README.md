@@ -31,6 +31,16 @@ rejecting sends a room-scoped `call-rejected` signal without enabling the
 camera or microphone. Both participants must grant camera/microphone access to
 join. The existing WebRTC video UI and media controls use the room ID entered
 for chat. Ending a video call closes the call interface and returns to the chat.
+The Socket.IO host being available over HTTPS (including
+`signaling.mukeshmahara.com.np`) does not provide a WebRTC media relay. Video
+currently uses public STUN servers; networks that block direct peer connections
+need a TURN server. Configure `REACT_APP_TURN_SERVER_URL` (one or more
+comma-separated `turn:`/`turns:` URLs), `REACT_APP_TURN_SERVER_USERNAME`, and
+`REACT_APP_TURN_SERVER_CREDENTIAL`, then rebuild/redeploy the frontend. Create
+React App embeds these values in public browser code, so use short-lived,
+restricted TURN credentials; do not put a permanent TURN secret in frontend
+environment variables. Production deployments should obtain temporary TURN
+credentials from a server-side endpoint.
 
 Messages (sent and received) are stored in browser local storage under a key scoped
 to the room ID, so history is available again on that browser. This is local

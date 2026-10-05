@@ -16,6 +16,34 @@ const ICE_SERVERS = [
   },
 ];
 
+const getIceServers = () => {
+  const turnUrls = process.env.REACT_APP_TURN_SERVER_URL?.split(",")
+    .map((url) => url.trim())
+    .filter(Boolean);
+  const username = process.env.REACT_APP_TURN_SERVER_USERNAME;
+  const credential = process.env.REACT_APP_TURN_SERVER_CREDENTIAL;
+
+  if (!turnUrls?.length) {
+    return ICE_SERVERS;
+  }
+
+  if (!username || !credential) {
+    console.warn(
+      "TURN URLs are configured without credentials; using STUN only.",
+    );
+    return ICE_SERVERS;
+  }
+
+  return [
+    ...ICE_SERVERS,
+    {
+      urls: turnUrls,
+      username,
+      credential,
+    },
+  ];
+};
+
 export const useWebRTC = ({
   localVideoRef,
   remoteVideoRef,
@@ -30,6 +58,7 @@ export const useWebRTC = ({
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionState, setConnectionState] = useState("disconnected");
+  const [connectionError, setConnectionError] = useState("");
   const [isRinging, setIsRinging] = useState(false);
   const [incomingCall, setIncomingCall] = useState(null);
 
@@ -193,7 +222,7 @@ export const useWebRTC = ({
       pendingIceCandidatesRef.current = [];
 
       const peerConnection = new RTCPeerConnection({
-        iceServers: ICE_SERVERS,
+        iceServers: getIceServers(),
       });
 
       peerConnectionRef.current = peerConnection;
@@ -274,6 +303,7 @@ export const useWebRTC = ({
 
             setIsCallActive(true);
             setIsConnecting(false);
+            setConnectionError("");
 
             break;
 
@@ -290,6 +320,9 @@ export const useWebRTC = ({
 
             setIsCallActive(false);
             setIsConnecting(false);
+            setConnectionError(
+              "Could not establish a network path to the other caller. This is commonly caused by a restrictive NAT or firewall; configure a TURN relay and try again.",
+            );
 
             break;
 
@@ -315,6 +348,11 @@ export const useWebRTC = ({
           "🧊 ICE connection state:",
           peerConnection.iceConnectionState,
         );
+        if (peerConnection.iceConnectionState === "failed") {
+          setConnectionError(
+            "ICE connectivity failed. A TURN relay is usually required when either caller is behind a restrictive NAT or firewall.",
+          );
+        }
       };
 
       // ------------------------------------------------
@@ -387,6 +425,7 @@ export const useWebRTC = ({
     setIsCallActive(false);
     setIsConnecting(false);
     setConnectionState("disconnected");
+    setConnectionError("");
 
     setIsAudioEnabled(true);
     setIsVideoEnabled(true);
@@ -1166,6 +1205,7 @@ export const useWebRTC = ({
     isVideoEnabled,
     isConnecting,
     connectionState,
+    connectionError,
     isRinging,
     incomingCall,
 
