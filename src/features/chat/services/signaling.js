@@ -116,6 +116,20 @@ export const createSignalingServer = () => {
         });
       });
 
+      socket.on("audio-call", (data) => {
+        notify({
+          ...data,
+          type: "audio-call",
+        });
+      });
+
+      socket.on("video-call-request", (data) => {
+        notify({
+          ...data,
+          type: "video-call-request",
+        });
+      });
+
       socket.on("disconnect", (reason) => {
         console.log("🔴 Socket.IO disconnected:", reason);
 
@@ -211,6 +225,19 @@ export const createSignalingServer = () => {
               },
             );
           });
+
+        case "audio-call":
+          socket.emit("audio-call", {
+            roomId: currentRoomId,
+            ...message.message,
+          });
+          break;
+
+        case "video-call-request":
+          socket.emit("video-call-request", {
+            roomId: currentRoomId,
+          });
+          break;
 
         default:
           console.warn("⚠️ Unknown signaling message:", message.type);
