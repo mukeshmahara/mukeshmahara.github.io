@@ -7,61 +7,27 @@ import {
   Mic,
   MicOff,
   User,
-  Wifi,
-  Loader2,
-  Circle,
-  HelpCircle,
   X,
   Check,
-  Clock,
-  AlertCircle,
-  Radio,
-  RadioTower,
   Maximize2,
   Minimize2,
   VideoOff,
 } from "lucide-react";
 
 const STATUS = {
-  connected: {
-    icon: <Circle className="w-2 h-2 fill-emerald-500 text-emerald-500" />,
-    text: "Connected",
-    color: "text-emerald-500",
-    dotColor: "bg-emerald-500",
-  },
-  connecting: {
-    icon: <Loader2 className="w-3 h-3 animate-spin text-amber-500" />,
-    text: "Connecting...",
-    color: "text-amber-500",
-    dotColor: "bg-amber-500",
-  },
-  "waiting-for-answer": {
-    icon: <Loader2 className="w-3 h-3 animate-spin text-amber-500" />,
-    text: "Ringing...",
-    color: "text-amber-500",
-    dotColor: "bg-amber-500",
-  },
-  "waiting-for-offer": {
-    icon: <Clock className="w-3 h-3 text-slate-400" />,
-    text: "Waiting for call",
-    color: "text-slate-400",
-    dotColor: "bg-slate-400",
-  },
-  disconnected: {
-    icon: <Circle className="w-2 h-2 fill-slate-500 text-slate-500" />,
-    text: "Ready",
-    color: "text-slate-400",
-    dotColor: "bg-slate-500",
-  },
-  failed: {
-    icon: <AlertCircle className="w-3 h-3 text-red-500" />,
-    text: "Connection failed",
-    color: "text-red-500",
-    dotColor: "bg-red-500",
-  },
+  connected: { text: "Connected", color: "connected" },
+  connecting: { text: "Connecting", color: "connecting" },
+  "waiting-for-answer": { text: "Ringing", color: "connecting" },
+  "waiting-for-offer": { text: "Waiting", color: "idle" },
+  disconnected: { text: "Ready", color: "idle" },
+  failed: { text: "Call failed", color: "failed" },
 };
 
-const VideoChat = ({ onCallEnd }) => {
+const VideoChat = ({
+  onCallEnd,
+  roomId = "demo-room",
+  autoCallMode = null,
+}) => {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
 
@@ -69,7 +35,6 @@ const VideoChat = ({ onCallEnd }) => {
     isCallActive,
     isAudioEnabled,
     isVideoEnabled,
-    isConnecting,
     connectionState,
     isRinging,
     incomingCall,
@@ -85,11 +50,26 @@ const VideoChat = ({ onCallEnd }) => {
   } = useWebRTC({
     localVideoRef,
     remoteVideoRef,
+    roomId,
   });
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const controlsTimeoutRef = useRef(null);
+  const autoCallStartedRef = useRef(false);
+
+  useEffect(() => {
+    if (!autoCallMode || !signalingServer || autoCallStartedRef.current) {
+      return;
+    }
+
+    autoCallStartedRef.current = true;
+    if (autoCallMode === "caller") {
+      startCall();
+    } else {
+      joinCall();
+    }
+  }, [autoCallMode, joinCall, signalingServer, startCall]);
 
   useEffect(() => {
     // Auto-hide controls in fullscreen mode after 3 seconds
@@ -141,87 +121,71 @@ const VideoChat = ({ onCallEnd }) => {
   }, [isCallActive]);
 
   const status = STATUS[connectionState] ?? {
-    icon: <Circle className="w-2 h-2 fill-slate-500 text-slate-500" />,
     text: connectionState,
-    color: "text-slate-400",
-    dotColor: "bg-slate-500",
+    color: "idle",
   };
 
-  // Ringing status override
-  const ringingStatus = {
-    icon: <Phone className="w-4 h-4 text-amber-500 animate-pulse" />,
-    text: incomingCall
-      ? `Incoming call from ${incomingCall.from}`
-      : "Incoming call",
-    color: "text-amber-500",
-    dotColor: "bg-amber-500",
+  const handleEndCall = () => {
+    endCall();
+    onCallEnd?.();
   };
 
-  const displayStatus = isRinging ? ringingStatus : status;
+  const handleRejectCall = () => {
+    rejectCall();
+    onCallEnd?.();
+  };
 
   return (
     <div
-      className={`video-chat-container backdrop-blur-md bg-slate-900/50 border border-slate-700/50 rounded-2xl p-6 shadow-2xl transition-all duration-300 hover:shadow-slate-900/50 ${
+      className={`relative mx-auto w-full max-w-5xl overflow-auto rounded-2xl border border-slate-700/70 bg-slate-900/95 p-3 shadow-2xl sm:p-5 ${
         isFullscreen && isCallActive
-          ? "fixed inset-0 w-screen h-screen rounded-none z-40 border-0 backdrop-blur-none bg-slate-950/90"
+          ? "fixed inset-0 z-40 h-dvh max-h-none w-screen max-w-none overflow-hidden rounded-none border-0 bg-slate-950 p-0"
           : ""
       }`}
     >
-      {/* Header */}
-      <div className="video-chat-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div
-          className={`header-left ${isFullscreen && isCallActive ? "hidden" : ""}`}
+      <div
+        className={`flex justify-end pb-2.5 ${isFullscreen && isCallActive ? "hidden" : ""}`}
+      >
+        <span
+          className="inline-flex items-center gap-2 rounded-full border border-slate-500/20 bg-slate-800 px-3 py-2 text-xs leading-none text-slate-300"
         >
-          <h3 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Video className="w-6 h-6 text-blue-500" />
-            Video Call
-          </h3>
-          <div className="subtitle text-sm text-slate-400">
-            {isCallActive ? "In call" : "Ready to connect"}
-          </div>
-        </div>
-
-        <div className="connection-status flex items-center gap-3 bg-slate-800/50 rounded-lg px-4 py-2">
-          <div className={`w-2 h-2 rounded-full ${displayStatus.dotColor}`} />
           <span
-            className={`status-text text-sm font-medium ${displayStatus.color}`}
-          >
-            {displayStatus.text}
-          </span>
-          <span className="signal-type text-xs text-slate-500 flex items-center gap-1">
-            {signalingServer?.getConnectionType?.() === "websocket" ? (
-              <RadioTower className="w-3 h-3" />
-            ) : (
-              <Radio className="w-3 h-3" />
-            )}
-            <span>
-              {signalingServer?.getConnectionType?.() || "checking..."}
-            </span>
-          </span>
-        </div>
+            className={`h-2 w-2 rounded-full ${
+              isRinging || status.color === "connecting"
+                ? "animate-pulse bg-amber-400"
+                : status.color === "connected"
+                  ? "bg-emerald-400"
+                  : status.color === "failed"
+                    ? "bg-rose-400"
+                    : "bg-slate-400"
+            }`}
+            aria-hidden="true"
+          />
+          {isRinging ? "Incoming call" : status.text}
+        </span>
       </div>
 
       {/* Incoming Call Modal */}
       {isRinging && incomingCall && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="call-modal bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center shadow-2xl">
-            <Phone className="w-16 h-16 mx-auto mb-4 text-blue-500 animate-pulse" />
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-slate-700 bg-slate-900 p-6 text-center shadow-2xl sm:p-8">
+            <Phone className="mx-auto mb-4 h-14 w-14 animate-pulse text-sky-400 sm:h-16 sm:w-16" />
             <h3 className="text-xl font-bold text-slate-100 mb-2">
               Incoming Call
             </h3>
-            <p className="text-slate-400 mb-6">Join the video call</p>
+            <p className="mb-6 text-sm text-slate-400">Join the video call</p>
 
-            <div className="ringing-actions flex gap-3 justify-center">
+            <div className="flex justify-center gap-3">
               <button
                 onClick={acceptCall}
-                className="action-btn success bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 font-medium text-white transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300"
               >
                 <Check className="w-4 h-4" />
                 <span className="btn-text">Accept</span>
               </button>
               <button
-                onClick={rejectCall}
-                className="action-btn danger bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2"
+                onClick={handleRejectCall}
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-rose-700 px-5 py-3 font-medium text-white transition hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-300"
               >
                 <X className="w-4 h-4" />
                 <span className="btn-text">Reject</span>
@@ -232,20 +196,22 @@ const VideoChat = ({ onCallEnd }) => {
       )}
       {/* Video Grid */}
       <div
-        className={`video-grid grid gap-4 mb-6 ${
+        className={`relative mb-3 gap-3 md:mb-4 md:gap-4 ${
           isFullscreen && isCallActive
-            ? "grid-cols-1 fixed inset-0 z-0 w-screen h-screen gap-0 mb-0 p-0"
-            : "grid-cols-1 lg:grid-cols-2"
+          ? "fixed inset-0 z-0 block h-dvh w-screen"
+          : "grid grid-cols-1 md:grid-cols-[minmax(0,2fr)_minmax(220px,1fr)]"
         }`}
       >
         {/* Remote Video */}
         <div
-          className={`video-container remote-video relative ${
-            isFullscreen && isCallActive ? "h-full w-full p-0" : ""
+          className={`relative overflow-hidden bg-slate-950 shadow-xl ${
+            isFullscreen && isCallActive
+              ? "fixed inset-0 z-0 h-dvh w-screen rounded-none"
+              : "h-[min(48dvh,420px)] min-h-[230px] rounded-2xl md:h-[clamp(320px,52vh,560px)]"
           }`}
         >
-          <div className="video-label absolute top-3 left-3 z-10">
-            <span className="user-badge bg-slate-900/80 text-slate-200 text-xs font-medium px-3 py-1.5 rounded-full backdrop-blur-sm flex items-center gap-1">
+          <div className="absolute left-3 top-3 z-10">
+            <span className="flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1.5 text-xs font-medium text-slate-200 backdrop-blur-sm">
               <User className="w-3 h-3" />
               Guest
             </span>
@@ -256,21 +222,21 @@ const VideoChat = ({ onCallEnd }) => {
             autoPlay
             playsInline
             muted={false}
-            className={`video-element w-full h-full object-cover ${
+            className={`block h-full w-full bg-black object-cover ${
               isFullscreen && isCallActive
-                ? "w-screen h-screen rounded-none"
-                : "rounded-xl"
+                ? "h-dvh w-screen rounded-none"
+                : "rounded-2xl"
             }`}
           />
 
           {!remoteStream && (
-            <div className="video-placeholder absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/70">
-              <div className="placeholder-content text-center">
-                <Video className="w-16 h-16 mx-auto mb-4 text-slate-500" />
-                <h4 className="text-slate-300 font-medium mb-1">
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800/70 to-slate-950/90">
+              <div className="max-w-60 px-4 text-center">
+                <Video className="mx-auto mb-4 h-14 w-14 text-slate-500 sm:h-16 sm:w-16" />
+                <h4 className="mb-1 font-medium text-slate-300">
                   Waiting for connection
                 </h4>
-                <p className="text-slate-500 text-sm">
+                <p className="text-sm text-slate-500">
                   Invite someone to start a call
                 </p>
               </div>
@@ -279,9 +245,13 @@ const VideoChat = ({ onCallEnd }) => {
         </div>
 
         {/* Local Video */}
-        <div className="video-container local-video relative">
-          <div className="video-label absolute top-3 left-3 z-10">
-            <span className="user-badge bg-slate-900/80 text-slate-200 text-xs font-medium px-3 py-1.5 rounded-full backdrop-blur-sm flex items-center gap-1">
+        <div className={`relative overflow-hidden rounded-2xl bg-slate-950 shadow-xl ${
+          isFullscreen && isCallActive
+            ? "absolute bottom-6 right-6 z-20 h-[clamp(100px,15vw,190px)] w-[clamp(140px,20vw,260px)] border border-white/25"
+            : "h-[clamp(200px,34vh,380px)] max-md:absolute max-md:bottom-2 max-md:right-2 max-md:z-20 max-md:h-[clamp(136px,38vw,196px)] max-md:w-[clamp(104px,30vw,156px)] max-md:border max-md:border-white/25 max-md:shadow-2xl md:w-full"
+        }`}>
+          <div className="absolute left-3 top-3 z-10">
+            <span className="flex items-center gap-1.5 rounded-full bg-slate-950/75 px-3 py-1.5 text-xs font-medium text-slate-200 backdrop-blur-sm">
               <User className="w-3 h-3" />
               You
             </span>
@@ -292,105 +262,31 @@ const VideoChat = ({ onCallEnd }) => {
             autoPlay
             playsInline
             muted
-            className="video-element w-full h-full object-cover rounded-xl"
+            className="block h-full w-full rounded-2xl bg-black object-cover"
           />
-        </div>
-      </div>
-
-      {/* Call Controls with Call a Friend and Join Call Buttons */}
-      <div
-        className={`video-controls bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 ${
-          isFullscreen && isCallActive && !showControls
-            ? "opacity-0 pointer-events-none transition-opacity duration-300"
-            : ""
-        }`}
-      >
-        <div className="flex flex-col gap-4">
-          {/* Init Buttons - Call a Friend and Join Call */}
-          {!isCallActive && (
-            <div className="call-init-buttons flex gap-3 justify-center">
-              <button
-                onClick={startCall}
-                disabled={isConnecting}
-                className="action-btn primary bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-60 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 min-w-[160px]"
-              >
-                <Phone className="w-4 h-4" />
-                <span className="btn-text">
-                  {isConnecting ? "Calling..." : "Call a Friend"}
-                </span>
-                {isConnecting && <Loader2 className="w-4 h-4 animate-spin" />}
-              </button>
-
-              <button
-                onClick={joinCall}
-                disabled={isConnecting}
-                className="action-btn secondary bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-60 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 min-w-[160px]"
-              >
-                <Phone className="w-4 h-4" />
-                <span className="btn-text">Join Call</span>
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
       {/* Active Call Controls */}
       {isCallActive && (
         <div
-          className={`
-      active-call-controls
-      flex items-center justify-center gap-3
-      ${
-        isFullscreen
-          ? `
-            fixed
-            bottom-6
-            left-1/2
-            -translate-x-1/2
-            z-[100]
-            w-auto
-            px-4
-            py-3
-            rounded-2xl
-            bg-slate-950/80
-            backdrop-blur-xl
-            border border-white/10
-            shadow-2xl
-          `
-          : "relative mb-2"
-      }
-      ${
-        isFullscreen && !showControls
-          ? "opacity-0 pointer-events-none"
-          : "opacity-100 pointer-events-auto"
-      }
-      transition-opacity duration-300
-    `}
+          className={`flex items-center justify-center gap-2 transition-opacity duration-300 sm:gap-3 ${
+            isFullscreen
+              ? "fixed bottom-6 left-1/2 z-[100] w-max -translate-x-1/2 rounded-full border border-white/10 bg-slate-950/85 p-2 shadow-2xl backdrop-blur-xl"
+              : "relative mb-2"
+          } ${
+            isFullscreen && !showControls
+              ? "pointer-events-none opacity-0"
+              : "pointer-events-auto opacity-100"
+          }`}
         >
           {/* End Call */}
           <button
             type="button"
-            onClick={endCall}
+            onClick={handleEndCall}
             aria-label="End call"
             title="End call"
-            className="
-        flex items-center justify-center
-        w-12 h-12
-        rounded-full
-        bg-red-600
-        hover:bg-red-700
-        active:bg-red-800
-        text-white
-        shadow-lg
-        transition-all
-        duration-200
-        hover:scale-105
-        focus:outline-none
-        focus:ring-2
-        focus:ring-red-400
-        focus:ring-offset-2
-        focus:ring-offset-slate-900
-      "
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-700 text-white shadow-lg transition hover:scale-105 hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:ring-offset-2 focus:ring-offset-slate-900"
           >
             <PhoneOff className="w-5 h-5 text-white shrink-0" />
           </button>
@@ -403,26 +299,11 @@ const VideoChat = ({ onCallEnd }) => {
               isAudioEnabled ? "Mute microphone" : "Unmute microphone"
             }
             title={isAudioEnabled ? "Mute microphone" : "Unmute microphone"}
-            className={`
-        flex items-center justify-center
-        w-12 h-12
-        rounded-full
-        text-white
-        shadow-lg
-        transition-all
-        duration-200
-        hover:scale-105
-        focus:outline-none
-        focus:ring-2
-        focus:ring-white/40
-        focus:ring-offset-2
-        focus:ring-offset-slate-900
-        ${
-          isAudioEnabled
-            ? "bg-emerald-600 hover:bg-emerald-700"
-            : "bg-slate-600 hover:bg-slate-700"
-        }
-      `}
+            className={`flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-slate-900 ${
+              isAudioEnabled
+                ? "bg-emerald-700 hover:bg-emerald-600"
+                : "bg-slate-600 hover:bg-slate-500"
+            }`}
           >
             {isAudioEnabled ? (
               <Mic className="w-5 h-5 text-white shrink-0" />
@@ -437,26 +318,11 @@ const VideoChat = ({ onCallEnd }) => {
             onClick={toggleVideo}
             aria-label={isVideoEnabled ? "Turn camera off" : "Turn camera on"}
             title={isVideoEnabled ? "Turn camera off" : "Turn camera on"}
-            className={`
-        flex items-center justify-center
-        w-12 h-12
-        rounded-full
-        text-white
-        shadow-lg
-        transition-all
-        duration-200
-        hover:scale-105
-        focus:outline-none
-        focus:ring-2
-        focus:ring-white/40
-        focus:ring-offset-2
-        focus:ring-offset-slate-900
-        ${
-          isVideoEnabled
-            ? "bg-emerald-600 hover:bg-emerald-700"
-            : "bg-slate-600 hover:bg-slate-700"
-        }
-      `}
+            className={`flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-slate-900 ${
+              isVideoEnabled
+                ? "bg-emerald-700 hover:bg-emerald-600"
+                : "bg-slate-600 hover:bg-slate-500"
+            }`}
           >
             {isVideoEnabled ? (
               <Video className="w-5 h-5 text-white shrink-0" />
@@ -474,24 +340,7 @@ const VideoChat = ({ onCallEnd }) => {
             }}
             aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-            className="
-        flex items-center justify-center
-        w-12 h-12
-        rounded-full
-        bg-purple-600
-        hover:bg-purple-700
-        active:bg-purple-800
-        text-white
-        shadow-lg
-        transition-all
-        duration-200
-        hover:scale-105
-        focus:outline-none
-        focus:ring-2
-        focus:ring-purple-400
-        focus:ring-offset-2
-        focus:ring-offset-slate-900
-      "
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-700 text-white shadow-lg transition hover:scale-105 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2 focus:ring-offset-slate-900"
           >
             {isFullscreen ? (
               <Minimize2 className="w-5 h-5 text-white shrink-0" />
@@ -501,57 +350,6 @@ const VideoChat = ({ onCallEnd }) => {
           </button>
         </div>
       )}
-
-      {/* Connection Details */}
-      <div className="call-info mt-4 pt-4 border-t border-slate-700/50">
-        <div className="connection-details flex flex-wrap gap-4 justify-center text-sm text-slate-400">
-          <span className="detail-item flex items-center gap-2">
-            <Wifi className="w-3 h-3 text-slate-500" />
-            <strong className="text-slate-300">Status:</strong> {status.text}
-          </span>
-          <span className="detail-item flex items-center gap-2">
-            {isAudioEnabled ? (
-              <Mic className="w-3 h-3 text-slate-500" />
-            ) : (
-              <MicOff className="w-3 h-3 text-slate-500" />
-            )}
-            <strong className="text-slate-300">Audio:</strong>{" "}
-            {isAudioEnabled ? "On" : "Off"}
-          </span>
-          <span className="detail-item flex items-center gap-2">
-            {isVideoEnabled ? (
-              <Video className="w-3 h-3 text-slate-500" />
-            ) : (
-              <Video className="w-3 h-3 text-slate-500 opacity-50" />
-            )}
-            <strong className="text-slate-300">Video:</strong>{" "}
-            {isVideoEnabled ? "On" : "Off"}
-          </span>
-        </div>
-
-        {/* Help Section */}
-        <div className="help-text mt-4">
-          <details className="group bg-slate-800/30 rounded-lg p-3 border border-slate-700/30 hover:bg-slate-800/50 transition-colors">
-            <summary className="cursor-pointer flex items-center gap-2 text-sm text-blue-400 font-medium">
-              <HelpCircle className="w-4 h-4" />
-              How to use
-            </summary>
-            <div className="help-content mt-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/30">
-              <ol className="text-slate-400 space-y-2 text-sm list-decimal list-inside">
-                <li>Share this page URL with your friend</li>
-                <li>You click "Call a Friend" (Caller)</li>
-                <li>Friend clicks "Join Call" (Callee)</li>
-                <li>Allow camera/microphone permissions</li>
-                <li>Wait for connection (10-15 seconds)</li>
-              </ol>
-              <p className="tip mt-4 p-3 bg-blue-900/20 rounded-md border-l-4 border-blue-600 text-slate-300 text-sm">
-                <strong className="text-blue-400">Tip:</strong> Use Chrome on
-                HTTPS for best results
-              </p>
-            </div>
-          </details>
-        </div>
-      </div>
     </div>
   );
 };
