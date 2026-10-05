@@ -19,13 +19,18 @@ offer, answer, ICE candidate, and hang-up signaling. Both participants must stay
 in the same chat room. Microphone access and a secure context (HTTPS or localhost)
 are required. For connections across restrictive NATs/firewalls, configure a TURN
 server in `components/AudioCall.jsx`; the default STUN server alone may not connect
-every network.
+every network. Incoming audio calls show a centered answer/reject prompt; ending
+or rejecting a call returns to the chat. Incoming audio and video calls play a
+soft repeating ringtone and animate the call icon; browser autoplay settings may
+require prior user interaction before sound can play.
 
 Video calls are started from the video icon in the room header. The caller sends a
-room-scoped `video-call-request`; the other participant's chat client opens the
-video interface and automatically joins the call. They can accept or reject the
-incoming call, and both participants must grant camera/microphone access. The
-existing WebRTC video UI and media controls use the room ID entered for chat.
+room-scoped `video-call-request`; the other participant's chat client shows an
+incoming-call prompt. Answering opens the video interface and joins the call;
+rejecting sends a room-scoped `call-rejected` signal without enabling the
+camera or microphone. Both participants must grant camera/microphone access to
+join. The existing WebRTC video UI and media controls use the room ID entered
+for chat. Ending a video call closes the call interface and returns to the chat.
 
 Messages (sent and received) are stored in browser local storage under a key scoped
 to the room ID, so history is available again on that browser. This is local
