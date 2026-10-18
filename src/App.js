@@ -1,23 +1,11 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-
+import AppRoutes from "./routes/AppRoutes";
 import "./App.css";
 
 import ParticleBackground from "./Components/ParticleBackground";
-import Projects from "./Components/Projects";
-import Intro from "./Components/Intro";
-import Experience from "./Components/Experience";
-import Education from "./Components/Education";
-import Skills from "./Components/Skills";
-import Achievements from "./Components/Achievements";
 import Sidebar from "./Components/Sidebar";
-import ChatBot from "./Components/ChatBot";
-import CouponCheckerComponent from "./Components/CouponCheckerComponent";
-import DrawsPage from "./Components/ird/DrawsPage";
-import Chat from "../src/features/chat/Chat";
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const location = useLocation();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -65,37 +53,7 @@ function App() {
         <main className="content">
           <ParticleBackground />
 
-          <Routes>
-            <Route path="/" element={<Intro />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/experience" element={<Experience />} />
-            <Route path="/education" element={<Education />} />
-            <Route path="/skills" element={<Skills />} />
-            <Route path="/achievements" element={<Achievements />} />
-            <Route
-              path="/coupon-checker"
-              element={<CouponCheckerComponent />}
-            />
-            <Route
-              path="/voice-assistant"
-              element={
-                <div className="content-section">
-                  <h2>AI Assistant</h2>
-                  <p>
-                    The floating AI assistant is available on every page. Click
-                    the avatar in the bottom right to start a voice command.
-                  </p>
-                </div>
-              }
-            />
-            <Route path="/draws" element={<DrawsPage />} />
-            <Route path="/chat" element={<Chat />} />
-
-            {/* Unknown URL */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-
-          {location.pathname !== "/chat" && <ChatBot />}
+          <AppRoutes />
         </main>
       </div>
     </div>
